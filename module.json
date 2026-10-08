@@ -1,0 +1,47 @@
+{
+  "id": "roll-ensemble-coc7",
+  "title": "Roll Ensemble — CoC7",
+  "description": "Lancers de groupe animés utilisant les compétences et les règles de jets du système Call of Cthulhu 7e (dés bonus/malus, paliers de réussite, jets d'opposition par équipes).",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Stéphane"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "languages": [
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "languages/fr.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "socket": true,
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "CoC7",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
+  },
+  "url": "https://github.com/magisterphamtom/roll-ensemble-coc7",
+  "manifest": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/latest/download/module.json",
+  "download": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/download/v1.0.0/module.zip",
+  "bugs": "https://github.com/magisterphamtom/roll-ensemble-coc7/issues"
+}

@@ -1,0 +1,20 @@
+<div class="re-chat-recap">
+  <h3><i class="fa-solid fa-dice-d10"></i> {{label}}</h3>
+  <table>
+    <tbody>
+      {{#each participants}}
+        <tr class="{{#if this.isWinner}}re-chat-winner{{/if}}">
+          <td class="re-chat-name"><img src="{{this.img}}" /> {{this.name}}{{#if ../teams}} <span class="re-chat-team">({{this.team}})</span>{{/if}}</td>
+          <td class="re-chat-skill">{{this.skillLabel}} ({{this.effectiveSkill}}%)</td>
+          <td class="re-chat-roll">{{this.roll}}</td>
+          <td class="re-chat-level re-chat-level-{{this.level}}">{{localize (concat "ROLLENSEMBLECOC7.Level." this.level)}}</td>
+          {{#if this.hasThreshold}}
+            <td class="re-chat-threshold {{#if this.meetsThreshold}}re-threshold-pass{{else}}re-threshold-fail{{/if}}">
+              {{#if this.meetsThreshold}}{{localize "ROLLENSEMBLECOC7.Threshold.Success"}}{{else}}{{localize "ROLLENSEMBLECOC7.Threshold.Failure"}}{{/if}}
+            </td>
+          {{/if}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

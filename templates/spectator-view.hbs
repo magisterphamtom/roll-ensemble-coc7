@@ -1,0 +1,18 @@
+<div class="re-spectator">
+  <div class="re-winner-banner"></div>
+  <div class="re-participants">
+    {{#each participants}}
+      <div class="re-participant re-team-{{this.team}}" data-key="{{this.key}}">
+        <img src="{{this.img}}" alt="{{this.name}}" />
+        <div class="re-info">
+          <span class="re-name">{{this.name}}</span>
+          <span class="re-skill">{{this.skillLabel}} ({{this.effectiveSkill}}%)</span>
+          {{#if this.noSkill}}<span class="re-no-skill-note">{{localize "ROLLENSEMBLECOC7.Config.NoSkillOnSheet"}}</span>{{/if}}
+          <span class="re-level">{{#if this.pending}}{{localize "ROLLENSEMBLECOC7.Spectator.WaitingFor"}}{{/if}}</span>
+          <span class="re-threshold"></span>
+        </div>
+        <div class="re-value">{{#if this.pending}}<i class="fa-solid fa-hourglass-half"></i>{{else}}--{{/if}}</div>
+      </div>
+    {{/each}}
+  </div>
+</div>

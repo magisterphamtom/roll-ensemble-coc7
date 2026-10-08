@@ -1,0 +1,614 @@
+/* =========================================================
+   Roll Ensemble — CoC7
+   Thème Art Déco 1920s : crème vieilli, laiton, bordeaux,
+   vert profond. Inspiré des affiches et reliures de l'époque.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+.re-config, .re-spectator, .re-chat-recap {
+  --re-cream: #f2e9d3;
+  --re-cream-dark: #e6d9b8;
+  --re-ink: #1c140d;
+  --re-brass: #b8860b;
+  --re-brass-light: #d4af37;
+  --re-burgundy: #6d1a24;
+  --re-green: #1f3d2b;
+  --re-shadow: rgba(0, 0, 0, 0.45);
+  font-family: 'EB Garamond', Georgia, serif;
+  color: var(--re-ink);
+}
+
+.re-config h3, .re-chat-recap h3, .re-spectator .re-winner-banner {
+  font-family: 'Cinzel', 'EB Garamond', serif;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Conteneur général : "carte" crème avec liseré laiton ---------- */
+.re-config {
+  background: var(--re-cream) linear-gradient(180deg, rgba(255,255,255,0.35), rgba(0,0,0,0.03));
+  border: 1px solid var(--re-brass);
+  border-radius: 3px;
+  padding: 14px 16px;
+  box-shadow: inset 0 0 0 3px var(--re-cream-dark), inset 0 0 0 4px var(--re-brass);
+  position: relative;
+}
+.re-config::before, .re-config::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  background:
+    linear-gradient(45deg, transparent 48%, var(--re-brass) 49%, var(--re-brass) 51%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, var(--re-brass) 49%, var(--re-brass) 51%, transparent 52%);
+  opacity: 0.8;
+}
+.re-config::before { top: 6px; left: 6px; }
+.re-config::after { bottom: 6px; right: 6px; transform: rotate(180deg); }
+
+.re-config .form-group { margin-bottom: 10px; }
+.re-config label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--re-burgundy);
+  display: block;
+  margin-bottom: 3px;
+}
+.re-config .hint { font-size: 11px; opacity: 0.75; margin: 2px 0 0; font-style: italic; color: var(--re-ink); }
+.re-config label.checkbox {
+  display: flex; align-items: center; gap: 6px;
+  text-transform: none; font-family: 'EB Garamond', serif; font-size: 13px; color: var(--re-ink);
+}
+
+/* ---------- Champs texte / nombre ---------- */
+.re-config input[type="text"],
+.re-config input[type="number"] {
+  background: #fffdf6;
+  border: 1px solid var(--re-brass);
+  border-radius: 2px;
+  color: var(--re-ink) !important;
+  font-family: 'EB Garamond', serif;
+  padding: 3px 6px;
+}
+.re-config input[type="text"]:focus,
+.re-config input[type="number"]:focus {
+  outline: none;
+  border-color: var(--re-burgundy);
+  box-shadow: 0 0 0 1px var(--re-burgundy);
+}
+
+/* ---------- Menus déroulants : texte noir garanti, quel que soit le thème Foundry ---------- */
+.re-config select,
+.re-config select option,
+.re-spectator select,
+.re-spectator select option {
+  background-color: #fffdf6 !important;
+  color: #1c140d !important;
+  border: 1px solid var(--re-brass);
+  border-radius: 2px;
+  font-family: 'EB Garamond', serif;
+  padding: 3px 4px;
+}
+.re-config select:focus { outline: none; border-color: var(--re-burgundy); }
+
+/* ---------- Ligne difficulté / équipes ---------- */
+.re-config-row { display: flex; gap: 14px; }
+.re-config-row .form-group { flex: 1; }
+
+/* ---------- Sélecteur rapide de tokens ---------- */
+.re-token-picker {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.re-token-group { flex: 1; min-width: 0; }
+.re-token-group-label {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--re-burgundy);
+  margin-bottom: 4px;
+}
+.re-token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid rgba(184, 134, 11, 0.4);
+  border-radius: 3px;
+  background: rgba(255, 253, 246, 0.5);
+}
+.re-token-grid::-webkit-scrollbar { width: 7px; }
+.re-token-grid::-webkit-scrollbar-thumb { background: var(--re-brass); border-radius: 4px; }
+
+.re-token-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 3px;
+  padding: 3px;
+  cursor: pointer;
+  color: var(--re-ink);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+.re-token-card:hover { background: rgba(184, 134, 11, 0.12); transform: translateY(-1px); }
+.re-token-card img {
+  width: 44px; height: 44px; object-fit: cover;
+  border-radius: 3px; border: 1px solid var(--re-brass);
+}
+.re-token-card span {
+  font-size: 9px;
+  text-align: center;
+  line-height: 1.1;
+  max-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.re-token-card.re-token-selected {
+  border-color: var(--re-burgundy);
+  background: rgba(109, 26, 36, 0.12);
+}
+.re-token-card.re-token-selected img { border-color: var(--re-burgundy); box-shadow: 0 0 4px var(--re-burgundy); }
+.re-token-card.re-token-selected span { color: var(--re-burgundy); font-weight: 700; }
+
+/* ---------- Badges réussite / échec (difficulté requise) ---------- */
+.re-threshold {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 8px;
+  display: inline-block;
+  width: fit-content;
+}
+.re-threshold-pass { background: rgba(31, 61, 43, 0.18); color: var(--re-green, #1f3d2b); }
+.re-threshold-fail { background: rgba(109, 26, 36, 0.18); color: var(--re-burgundy, #6d1a24); }
+.re-chat-threshold.re-threshold-pass { color: #1f3d2b; text-align: right; font-weight: 700; font-size: 10px; text-transform: uppercase; }
+.re-chat-threshold.re-threshold-fail { color: #6d1a24; text-align: right; font-weight: 700; font-size: 10px; text-transform: uppercase; }
+
+/* ---------- Zone de dépôt ---------- */
+.re-dropzone {
+  border: 2px dashed var(--re-brass);
+  border-radius: 3px;
+  padding: 14px;
+  text-align: center;
+  margin: 10px 0 8px;
+  background: rgba(184, 134, 11, 0.07);
+  color: var(--re-burgundy);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.re-dropzone i { font-size: 20px; }
+
+/* ---------- Boutons ---------- */
+.re-add-selected, .re-launch, .re-remove {
+  background: linear-gradient(180deg, var(--re-cream-dark), var(--re-cream));
+  border: 1px solid var(--re-brass);
+  color: var(--re-ink);
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.re-add-selected:hover, .re-launch:hover, .re-remove:hover {
+  background: linear-gradient(180deg, var(--re-brass-light), var(--re-brass));
+  color: #241a0e;
+  box-shadow: 0 0 6px rgba(184, 134, 11, 0.6);
+}
+.re-add-selected { width: 100%; margin-bottom: 10px; padding: 6px; }
+.re-launch {
+  width: 100%; font-weight: 700; padding: 9px; font-size: 13px;
+  background: linear-gradient(180deg, var(--re-burgundy), #4a1119);
+  color: var(--re-cream);
+  border-color: var(--re-brass-light);
+}
+.re-launch:hover {
+  background: linear-gradient(180deg, #832531, var(--re-burgundy));
+  color: var(--re-brass-light);
+  box-shadow: 0 0 10px rgba(184, 134, 11, 0.5);
+}
+
+/* ---------- Liste des participants ---------- */
+.re-participant-list {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 320px; overflow-y: auto; margin-bottom: 10px;
+  padding-right: 2px;
+}
+.re-participant-list::-webkit-scrollbar { width: 8px; }
+.re-participant-list::-webkit-scrollbar-thumb { background: var(--re-brass); border-radius: 4px; }
+.re-participant-list::-webkit-scrollbar-track { background: var(--re-cream-dark); }
+
+.re-participant-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 7px;
+  border-radius: 3px;
+  background: rgba(255, 253, 246, 0.6);
+  border: 1px solid rgba(184, 134, 11, 0.4);
+}
+.re-participant-row img {
+  width: 40px; height: 40px; object-fit: cover;
+  border-radius: 2px; border: 1px solid var(--re-brass);
+}
+.re-participant-fields { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.re-participant-fields .re-name {
+  font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.03em;
+  color: var(--re-burgundy); font-weight: 700;
+}
+.re-field-line { display: flex; gap: 4px; }
+.re-field-line select { flex: 2; min-width: 0; font-size: 12px; }
+.re-field-line input[type="number"] { flex: 1; min-width: 0; font-size: 12px; }
+.re-skill-select { flex: 3 !important; }
+
+.re-remove { flex: 0 0 auto; width: 26px; height: 26px; line-height: 1; align-self: center; }
+.re-empty { opacity: 0.65; font-style: italic; text-align: center; color: var(--re-ink); }
+
+/* =========================================================
+   Vue spectateur — "carte de reliure" Art Déco
+   ========================================================= */
+.re-spectator {
+  display: flex; flex-direction: column; gap: 10px; padding: 10px 12px;
+  background: var(--re-cream) linear-gradient(180deg, rgba(255,255,255,0.3), rgba(0,0,0,0.04));
+  border: 1px solid var(--re-brass);
+  box-shadow: inset 0 0 0 3px var(--re-cream-dark), inset 0 0 0 4px var(--re-brass);
+}
+
+.re-winner-banner {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  min-height: 26px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  color: var(--re-burgundy);
+  text-transform: uppercase;
+}
+.re-winner-banner.re-visible { opacity: 1; transform: translateY(0); }
+
+.re-participants { display: flex; flex-direction: column; gap: 8px; }
+
+.re-participant {
+  --level-color: #888;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  background: rgba(255, 253, 246, 0.7);
+  border: 2px solid rgba(184, 134, 11, 0.35);
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.re-participant img { width: 42px; height: 42px; object-fit: cover; border-radius: 2px; border: 1px solid var(--re-brass); }
+.re-participant .re-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.re-participant .re-name {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 12px;
+  color: var(--re-ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.re-participant .re-skill { font-size: 11px; opacity: 0.7; font-style: italic; color: var(--re-ink); }
+.re-participant .re-level {
+  font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em; height: 13px;
+}
+.re-participant .re-value {
+  font-family: 'Cinzel', serif;
+  font-size: 24px; font-weight: 700;
+  min-width: 54px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.re-participant:not(.re-revealed) .re-value { color: #8a7c5c; filter: blur(0.3px); }
+.re-participant.re-revealed .re-value { animation: re-pop 0.35s ease; color: var(--level-color); }
+.re-participant.re-revealed { border-color: var(--level-color); }
+.re-participant.re-winner {
+  background: rgba(212, 175, 55, 0.22);
+  transform: scale(1.03);
+  box-shadow: 0 0 8px var(--level-color);
+}
+
+.re-team-A { box-shadow: inset 3px 0 0 var(--re-green); }
+.re-team-B { box-shadow: inset 3px 0 0 var(--re-burgundy); }
+.re-participant.re-winner.re-team-A { box-shadow: inset 3px 0 0 var(--re-green), 0 0 8px var(--level-color); }
+.re-participant.re-winner.re-team-B { box-shadow: inset 3px 0 0 var(--re-burgundy), 0 0 8px var(--level-color); }
+
+.re-participant.re-level-fumble .re-name { text-decoration: line-through wavy; }
+
+@keyframes re-pop {
+  0% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+/* =========================================================
+   Récap dans le chat
+   ========================================================= */
+.re-chat-recap {
+  background: #f2e9d3;
+  border: 1px solid #b8860b;
+  border-radius: 3px;
+  padding: 8px 10px;
+  color: #1c140d;
+}
+.re-chat-recap h3 {
+  margin: 0 0 6px; display: flex; align-items: center; gap: 6px;
+  color: #6d1a24; font-size: 13px;
+}
+.re-chat-recap table { width: 100%; border-collapse: collapse; }
+.re-chat-recap td { padding: 3px 4px; border-bottom: 1px solid rgba(184, 134, 11, 0.3); font-size: 12px; }
+.re-chat-name { display: flex; align-items: center; gap: 6px; }
+.re-chat-name img { width: 24px; height: 24px; object-fit: cover; border-radius: 2px; border: 1px solid #b8860b; }
+.re-chat-skill { opacity: 0.8; font-style: italic; }
+.re-chat-roll { font-weight: 700; text-align: center; font-family: 'Cinzel', serif; }
+.re-chat-level { font-weight: 700; text-align: right; text-transform: uppercase; font-size: 10px; font-family: 'Cinzel', serif; }
+.re-chat-level-fumble { color: #8b0000; }
+.re-chat-level-fail { color: #6b6255; }
+.re-chat-level-regular { color: #1f3d2b; }
+.re-chat-level-hard { color: #2d5f8a; }
+.re-chat-level-extreme { color: #6d3d8f; }
+.re-chat-level-critical { color: #a8790b; }
+.re-chat-winner { background: rgba(212, 175, 55, 0.25); }
+.re-chat-team { font-size: 10px; opacity: 0.65; }
+
+/* =========================================================
+   Disposition 3 colonnes façon Epic Rolls
+   ========================================================= */
+.re-config-3col {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  min-height: 480px;
+}
+.re-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: rgba(255, 253, 246, 0.45);
+  border: 1px solid rgba(184, 134, 11, 0.5);
+  border-radius: 4px;
+  padding: 8px;
+}
+.re-col-actors { flex: 1.3; display: flex; flex-direction: column; gap: 8px; }
+.re-col-skills { flex: 1; }
+.re-col-options { flex: 1; }
+
+.re-col-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--re-burgundy);
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(184, 134, 11, 0.4);
+  padding-bottom: 4px;
+}
+
+.re-col-block { display: flex; flex-direction: column; }
+.re-col-block-grow { flex: 1; min-height: 0; }
+
+/* ---------- Colonne acteurs : sélectionnés ---------- */
+.re-selected-list {
+  display: flex; flex-direction: column; gap: 5px;
+  max-height: 180px; overflow-y: auto; padding-right: 2px;
+}
+.re-selected-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 5px;
+  border-radius: 3px;
+  background: rgba(109, 26, 36, 0.06);
+  border: 1px solid rgba(184, 134, 11, 0.35);
+}
+.re-selected-row img { width: 32px; height: 32px; object-fit: cover; border-radius: 2px; border: 1px solid var(--re-brass); }
+.re-selected-fields { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.re-selected-fields .re-name { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; color: var(--re-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.re-selected-fields .re-field-line { display: flex; gap: 3px; }
+.re-selected-fields input[type="number"] { width: 44px; font-size: 11px; padding: 1px 3px; }
+.re-selected-fields select { font-size: 10px; padding: 1px 2px; flex: 1; min-width: 0; }
+.re-team-select { margin-top: 2px; }
+
+/* ---------- Colonne acteurs : disponibles ---------- */
+.re-search-input {
+  background: #fffdf6 !important;
+  color: #1c140d !important;
+  border: 1px solid var(--re-brass);
+  border-radius: 2px;
+  padding: 3px 6px;
+  margin-bottom: 5px;
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+}
+.re-available-list {
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1; min-height: 80px; max-height: 220px; overflow-y: auto;
+  padding-right: 2px; margin-bottom: 6px;
+}
+.re-available-list::-webkit-scrollbar, .re-selected-list::-webkit-scrollbar { width: 7px; }
+.re-available-list::-webkit-scrollbar-thumb, .re-selected-list::-webkit-scrollbar-thumb { background: var(--re-brass); border-radius: 4px; }
+
+.re-actor-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 5px; border-radius: 3px;
+  background: rgba(255, 253, 246, 0.6);
+}
+.re-actor-row img { width: 30px; height: 30px; object-fit: cover; border-radius: 2px; border: 1px solid var(--re-brass); }
+.re-actor-fields { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.re-actor-fields .re-name { font-size: 11px; color: var(--re-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.re-actor-fields .re-sub { font-size: 9px; opacity: 0.6; font-style: italic; }
+.re-add {
+  flex: 0 0 auto; width: 22px; height: 22px; line-height: 1;
+  border-radius: 50%; border: 1px solid var(--re-brass);
+  background: transparent; color: var(--re-burgundy); cursor: pointer;
+}
+.re-add:hover { background: var(--re-brass-light); color: #241a0e; }
+
+/* ---------- Colonne compétences ---------- */
+.re-skill-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding-right: 2px; }
+.re-skill-list::-webkit-scrollbar { width: 7px; }
+.re-skill-list::-webkit-scrollbar-thumb { background: var(--re-brass); border-radius: 4px; }
+.re-skill-group-label {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--re-brass); margin: 8px 0 3px; text-align: center;
+  border-top: 1px solid rgba(184, 134, 11, 0.35); padding-top: 6px;
+}
+.re-skill-list .re-skill-group-label:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+.re-skill-item {
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 3px 6px;
+  font-family: 'EB Garamond', serif;
+  font-size: 12px;
+  color: var(--re-ink);
+  cursor: pointer;
+}
+.re-skill-item:hover { background: rgba(184, 134, 11, 0.12); border-color: rgba(184, 134, 11, 0.4); }
+.re-skill-item.re-skill-selected {
+  background: rgba(109, 26, 36, 0.14);
+  border-color: var(--re-burgundy);
+  color: var(--re-burgundy);
+  font-weight: 700;
+}
+.re-skill-item-char .re-x5 { font-size: 9px; opacity: 0.6; margin-left: 3px; }
+.re-empty-center { text-align: center; margin-top: 30px; }
+
+/* ---------- Colonne options ---------- */
+.re-col-options .form-group { margin-bottom: 10px; }
+.re-selected-skill-display {
+  background: rgba(109, 26, 36, 0.08);
+  border: 1px solid var(--re-burgundy);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  color: var(--re-burgundy);
+}
+.re-selected-skill-display em { color: var(--re-ink); opacity: 0.6; font-style: italic; font-weight: 400; }
+.re-col-options .re-launch-row { margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
+.re-send-request {
+  font-family: 'Cinzel', serif;
+  background: linear-gradient(180deg, var(--re-cream-dark), var(--re-cream));
+  border: 1px solid var(--re-green, #1f3d2b);
+  color: var(--re-green, #1f3d2b);
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 8px;
+  font-weight: 700;
+}
+.re-send-request:hover {
+  background: linear-gradient(180deg, var(--re-green, #1f3d2b), #142a1d);
+  color: var(--re-cream);
+  box-shadow: 0 0 8px rgba(31, 61, 43, 0.5);
+}
+
+/* ---------- Indicateur "compétence absente de la fiche" ---------- */
+.re-no-skill-note {
+  font-size: 9px; font-style: italic; color: var(--re-burgundy, #6d1a24); opacity: 0.85;
+}
+.re-participant.re-no-skill { opacity: 0.85; }
+
+.re-skill-item-special {
+  border-left: 2px solid var(--re-burgundy);
+}
+
+/* ---------- Bascule Requête joueur / Jet MJ ---------- */
+.re-mode-toggle {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  width: fit-content;
+  margin: 1px 0;
+}
+.re-mode-toggle.re-mode-request {
+  background: rgba(31, 61, 43, 0.15);
+  color: var(--re-green, #1f3d2b);
+  border-color: var(--re-green, #1f3d2b);
+}
+.re-mode-toggle.re-mode-gm {
+  background: rgba(109, 26, 36, 0.1);
+  color: var(--re-burgundy, #6d1a24);
+  border-color: rgba(109, 26, 36, 0.4);
+}
+.re-mode-toggle:hover { filter: brightness(1.1); }
+
+/* ---------- État "en attente d'un joueur" dans la vue spectateur ---------- */
+.re-participant.re-pending { opacity: 0.75; }
+.re-participant.re-pending .re-value {
+  font-size: 18px;
+  color: var(--re-brass, #b8860b);
+  animation: re-pulse 1.4s ease-in-out infinite;
+}
+.re-participant.re-pending .re-level { color: var(--re-brass, #b8860b); font-style: italic; text-transform: none; }
+@keyframes re-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ---------- Fenêtre de requête côté joueur ---------- */
+.re-request {
+  font-family: 'EB Garamond', Georgia, serif;
+  background: #f2e9d3;
+  border: 1px solid #b8860b;
+  border-radius: 4px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: #1c140d;
+}
+.re-request-intro { margin: 0; font-style: italic; text-align: center; }
+.re-request-card {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 253, 246, 0.7);
+  border: 1px solid rgba(184, 134, 11, 0.5);
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+.re-request-card img { width: 48px; height: 48px; object-fit: cover; border-radius: 3px; border: 1px solid #b8860b; }
+.re-request-info { display: flex; flex-direction: column; gap: 2px; }
+.re-request-name { font-family: 'Cinzel', serif; font-weight: 700; font-size: 13px; color: #6d1a24; }
+.re-request-skill { font-size: 12px; }
+.re-request-target { font-size: 11px; opacity: 0.75; }
+.re-request-roll {
+  font-family: 'Cinzel', serif;
+  background: linear-gradient(180deg, #6d1a24, #4a1119);
+  color: #f2e9d3;
+  border: 1px solid #d4af37;
+  border-radius: 3px;
+  padding: 8px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+.re-request-roll:hover { background: linear-gradient(180deg, #832531, #6d1a24); box-shadow: 0 0 8px rgba(184, 134, 11, 0.5); }
+.re-request-roll:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Grille "Joueurs" dédiée ---------- */
+.re-hint-small {
+  font-size: 10px;
+  font-style: italic;
+  opacity: 0.7;
+  margin: 0 0 5px;
+  color: var(--re-ink, #1c140d);
+}
+.re-player-grid {
+  max-height: 110px;
+}
