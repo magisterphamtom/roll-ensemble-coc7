@@ -29,14 +29,16 @@
   "socket": true,
   "compatibility": {
     "minimum": "13",
-    "verified": "14"
+    "verified": "14.368"
   },
   "relationships": {
     "systems": [
       {
         "id": "CoC7",
         "type": "system",
-        "compatibility": {}
+        "compatibility": {
+          "verified": "8.15"
+        }
       }
     ]
   },
