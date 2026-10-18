@@ -45,5 +45,11 @@
   "url": "https://github.com/magisterphamtom/roll-ensemble-coc7",
   "manifest": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/latest/download/module.json",
   "download": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/download/v1.0.0/module.zip",
-  "bugs": "https://github.com/magisterphamtom/roll-ensemble-coc7/issues"
+  "bugs": "https://github.com/magisterphamtom/roll-ensemble-coc7/issues",
+  "media": [
+    {
+      "type": "cover",
+      "url": "https://raw.githubusercontent.com/magisterphamtom/roll-ensemble-coc7/main/.github/banner.png"
+    }
+  ]
 }
