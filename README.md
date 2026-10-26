@@ -59,4 +59,4 @@ Si un échec critique survient pendant le lancer, le son d'échec critique rempl
 
 ## Crédits
 
-Code : magisterphamtom.
+Code : magisterphamtom (licence MIT).
