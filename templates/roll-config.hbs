@@ -1,172 +1,161 @@
-<div class="re-config re-config-3col">
-  <div class="re-col re-col-actors">
-    <div class="re-col-block">
-      <span class="re-col-title"><i class="fa-solid fa-check"></i> {{localize "ROLLENSEMBLECOC7.Config.Selected"}}</span>
-      <div class="re-selected-list">
-        {{#if selected.length}}
-          {{#each selected}}
-            <div class="re-selected-row" data-key="{{this.key}}">
-              <img src="{{this.img}}" alt="{{this.name}}" />
-              <div class="re-selected-fields">
-                <span class="re-name">{{this.name}}</span>
-                {{#if this.canRequest}}
-                  <button type="button" class="re-mode-toggle {{#if this.willRequest}}re-mode-request{{else}}re-mode-gm{{/if}}" data-action="toggleForceGM" data-key="{{this.key}}" title="{{#if this.willRequest}}{{localize 'ROLLENSEMBLECOC7.Config.WillRequestTitle'}} ({{this.ownerNames}}){{else}}{{localize 'ROLLENSEMBLECOC7.Config.WillGMTitle'}}{{/if}}">
-                    {{#if this.willRequest}}<i class="fa-solid fa-paper-plane"></i> {{localize "ROLLENSEMBLECOC7.Config.WillRequest"}}{{else}}<i class="fa-solid fa-user-shield"></i> {{localize "ROLLENSEMBLECOC7.Config.WillGM"}}{{/if}}
-                  </button>
-                {{/if}}
-                <div class="re-field-line">
-                  <input type="number" name="modifier-{{this.key}}" value="{{this.modifier}}" title="{{localize 'ROLLENSEMBLECOC7.Config.Modifier'}}" placeholder="±%" />
-                  <select name="dice-{{this.key}}" title="{{localize 'ROLLENSEMBLECOC7.Config.DiceHint'}}">
-                    <option value="-2" {{#if (eq this.dice -2)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.M2"}}</option>
-                    <option value="-1" {{#if (eq this.dice -1)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.M1"}}</option>
-                    <option value="0" {{#if (eq this.dice 0)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.Normal"}}</option>
-                    <option value="1" {{#if (eq this.dice 1)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.P1"}}</option>
-                    <option value="2" {{#if (eq this.dice 2)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.P2"}}</option>
-                  </select>
-                </div>
-                {{#if ../teams}}
-                  <select name="team-{{this.key}}" class="re-team-select">
-                    <option value="A" {{#if (eq this.team "A")}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.TeamA"}}</option>
-                    <option value="B" {{#if (eq this.team "B")}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.TeamB"}}</option>
-                  </select>
-                {{/if}}
-              </div>
-              <button type="button" class="re-remove" data-action="toggleToken" data-actor-uuid="{{this.actorUuid}}" title="{{localize 'ROLLENSEMBLECOC7.Config.Remove'}}">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-          {{/each}}
-        {{else}}
-          <p class="re-empty">{{localize "ROLLENSEMBLECOC7.Config.NoParticipants"}}</p>
-        {{/if}}
-      </div>
-    </div>
-
-    <div class="re-col-block">
-      <span class="re-col-title"><i class="fa-solid fa-user-group"></i> {{localize "ROLLENSEMBLECOC7.Config.PlayersOnly"}}</span>
-      <p class="re-hint-small">{{localize "ROLLENSEMBLECOC7.Config.CanvasClickHint"}}</p>
-      <div class="re-token-grid re-player-grid">
-        {{#each playerTokens}}
-          <button type="button" class="re-token-card {{#if this.selected}}re-token-selected{{/if}}" data-action="toggleToken" data-actor-uuid="{{this.actorUuid}}" title="{{this.name}}">
-            <img src="{{this.img}}" alt="{{this.name}}" />
-            <span>{{this.name}}</span>
-          </button>
-        {{else}}
-          <p class="re-empty">{{localize "ROLLENSEMBLECOC7.Config.NoTokens"}}</p>
-        {{/each}}
-      </div>
-    </div>
-
-    <div class="re-col-block re-col-block-grow">
-      <span class="re-col-title"><i class="fa-solid fa-users"></i> {{localize "ROLLENSEMBLECOC7.Config.Available"}}</span>
-      <input type="text" class="re-search-input" placeholder="{{localize 'ROLLENSEMBLECOC7.Config.SearchPlaceholder'}}" />
-      <div class="re-available-list">
-        {{#each available}}
-          <div class="re-actor-row" data-name="{{this.name}}">
-            <img src="{{this.img}}" alt="{{this.name}}" />
-            <div class="re-actor-fields">
-              <span class="re-name">{{this.name}}</span>
-              <span class="re-sub">{{this.sub}}</span>
-            </div>
-            <button type="button" class="re-add" data-action="toggleToken" data-actor-uuid="{{this.actorUuid}}">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-          </div>
-        {{else}}
-          <p class="re-empty">{{localize "ROLLENSEMBLECOC7.Config.NoTokens"}}</p>
-        {{/each}}
-      </div>
-      <div class="re-dropzone">
-        <i class="fa-solid fa-hand-pointer"></i>
-        <span>{{localize "ROLLENSEMBLECOC7.Config.DropZone"}}</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="re-col re-col-skills">
-    <span class="re-col-title"><i class="fa-solid fa-list"></i> {{localize "ROLLENSEMBLECOC7.Config.SkillPicker"}}</span>
-    {{#unless hasParticipants}}
-      <p class="re-empty re-empty-center">{{localize "ROLLENSEMBLECOC7.Config.PickActorsFirst"}}</p>
-    {{/unless}}
-    <div class="re-skill-list">
-      {{#if skillOptions.length}}
-        <span class="re-skill-group-label">{{localize "ROLLENSEMBLECOC7.Config.SkillsHeader"}}</span>
-        {{#each skillOptions}}
-          <button type="button" class="re-skill-item {{#if this.selected}}re-skill-selected{{/if}}" data-action="selectSkill" data-skill-kind="skill" data-skill-label="{{this.label}}">
-            {{this.label}}
-          </button>
-        {{/each}}
-      {{/if}}
-      {{#if hasParticipants}}
-        <span class="re-skill-group-label">{{localize "ROLLENSEMBLECOC7.Config.SpecialHeader"}}</span>
-        {{#each specialOptions}}
-          <button type="button" class="re-skill-item re-skill-item-special {{#if this.selected}}re-skill-selected{{/if}}" data-action="selectSkill" data-skill-kind="special" data-skill-key="{{this.key}}">
-            {{this.label}}
-          </button>
-        {{/each}}
-        <span class="re-skill-group-label">{{localize "ROLLENSEMBLECOC7.Config.CharacteristicsHeader"}}</span>
-        {{#each charOptions}}
-          <button type="button" class="re-skill-item re-skill-item-char {{#if this.selected}}re-skill-selected{{/if}}" data-action="selectSkill" data-skill-kind="char" data-skill-key="{{this.key}}">
-            {{this.label}} <span class="re-x5">×5</span>
-          </button>
-        {{/each}}
-      {{/if}}
-    </div>
-  </div>
-
-  <div class="re-col re-col-options">
-    <span class="re-col-title"><i class="fa-solid fa-sliders"></i> {{localize "ROLLENSEMBLECOC7.Config.RollOptions"}}</span>
-
-    <div class="form-group">
-      <label>{{localize "ROLLENSEMBLECOC7.Config.SelectedSkill"}}</label>
-      <div class="re-selected-skill-display">
-        {{#if selectedSkillLabel}}{{selectedSkillLabel}}{{else}}<em>{{localize "ROLLENSEMBLECOC7.Config.NoSkillSelected"}}</em>{{/if}}
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>{{localize "ROLLENSEMBLECOC7.Config.Label"}}</label>
+<div class="rc">
+  <header class="rc-tete">
+    <i class="fa-solid fa-dice-d10 rc-tete-de"></i>
+    <div class="rc-tete-champ">
+      <span class="rc-kicker">{{localize "ROLLENSEMBLECOC7.Banniere.Kicker"}}</span>
       <input type="text" name="label" value="{{label}}" placeholder="{{localize 'ROLLENSEMBLECOC7.Config.LabelPlaceholder'}}" />
     </div>
+  </header>
 
-    <div class="form-group">
-      <label>{{localize "ROLLENSEMBLECOC7.Config.Difficulty"}}</label>
-      <select name="difficulty">
-        <option value="none" {{#if (eq difficulty "none")}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.DifficultyNone"}}</option>
-        <option value="regular" {{#if (eq difficulty "regular")}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Level.regular"}}</option>
-        <option value="hard" {{#if (eq difficulty "hard")}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Level.hard"}}</option>
-        <option value="extreme" {{#if (eq difficulty "extreme")}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Level.extreme"}}</option>
-      </select>
-      <p class="hint">{{localize "ROLLENSEMBLECOC7.Config.DifficultyHint"}}</p>
-    </div>
+  <div class="rc-corps">
+    <section class="rc-gauche">
+      {{!-- 1. Qui lance ? --}}
+      <div class="rc-titre">
+        <span class="rc-num">1</span> {{localize "ROLLENSEMBLECOC7.Config.Qui"}}
+        <span class="rc-spacer"></span>
+        <button type="button" class="rc-lien" data-action="addAllPlayers"><i class="fa-solid fa-users"></i> {{localize "ROLLENSEMBLECOC7.Config.TousJoueurs"}}</button>
+        {{#if hasParticipants}}<button type="button" class="rc-lien" data-action="clearAll"><i class="fa-solid fa-eraser"></i> {{localize "ROLLENSEMBLECOC7.Config.Vider"}}</button>{{/if}}
+      </div>
+      <div class="rc-joueurs">
+        {{#each players}}
+          <button type="button" class="rc-joueur {{#if this.selected}}rc-choisi{{/if}}" data-action="toggleToken" data-actor-uuid="{{this.actorUuid}}" title="{{this.name}}">
+            <span class="rc-portrait"><img src="{{this.img}}" alt=""><i class="rc-coche fa-solid fa-check"></i></span>
+            <span class="rc-joueur-nom">{{#if this.online}}<i class="rc-en-ligne" title="{{localize 'ROLLENSEMBLECOC7.Config.EnLigne'}}"></i>{{/if}}{{this.name}}</span>
+            {{#if ../selectedSkillLabel}}<span class="rc-joueur-score">{{#if (eq this.score null)}}—{{else}}{{this.score}} %{{/if}}</span>{{/if}}
+          </button>
+        {{else}}
+          <p class="rc-vide">{{localize "ROLLENSEMBLECOC7.Config.AucunJoueur"}}</p>
+        {{/each}}
+      </div>
 
-    <div class="form-group">
-      <label>{{localize "ROLLENSEMBLECOC7.Config.GlobalDice"}}</label>
-      <select name="globalDice">
-        <option value="-2" {{#if (eq globalDice -2)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.M2"}}</option>
-        <option value="-1" {{#if (eq globalDice -1)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.M1"}}</option>
-        <option value="0" {{#if (eq globalDice 0)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.Normal"}}</option>
-        <option value="1" {{#if (eq globalDice 1)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.P1"}}</option>
-        <option value="2" {{#if (eq globalDice 2)}}selected{{/if}}>{{localize "ROLLENSEMBLECOC7.Config.Dice.P2"}}</option>
-      </select>
-      <p class="hint">{{localize "ROLLENSEMBLECOC7.Config.GlobalDiceHint"}}</p>
-    </div>
-
-    <div class="form-group">
-      <label class="checkbox">
-        <input type="checkbox" name="teams" {{checked teams}} />
-        {{localize "ROLLENSEMBLECOC7.Config.Teams"}}
-      </label>
-      <p class="hint">{{localize "ROLLENSEMBLECOC7.Config.TeamsHint"}}</p>
-    </div>
-
-    <div class="re-launch-row">
-      <button type="button" class="re-launch" data-action="launch" title="{{localize 'ROLLENSEMBLECOC7.Config.LaunchHint'}}">
-        <i class="fa-solid fa-dice-d10"></i> {{localize "ROLLENSEMBLECOC7.Config.Launch"}}
+      <button type="button" class="rc-tiroir {{#if npcOpen}}rc-ouvert{{/if}}" data-action="toggleNpc">
+        <i class="fa-solid fa-chevron-right"></i> {{localize "ROLLENSEMBLECOC7.Config.PnjAutres"}} <span class="rc-badge">{{npcs.length}}</span>
+        <span class="rc-astuce">{{localize "ROLLENSEMBLECOC7.Config.Glisser"}}</span>
       </button>
-      <button type="button" class="re-send-request" data-action="sendRequest" title="{{localize 'ROLLENSEMBLECOC7.Config.SendRequestHint'}}">
-        <i class="fa-solid fa-paper-plane"></i> {{localize "ROLLENSEMBLECOC7.Config.SendRequest"}}
+      {{#if npcOpen}}
+        <div class="rc-pnj-zone">
+          <input type="search" class="rc-recherche rc-recherche-pnj" placeholder="{{localize 'ROLLENSEMBLECOC7.Config.SearchPlaceholder'}}" />
+          <div class="rc-pnj-liste">
+            {{#each npcs}}
+              <button type="button" class="rc-pnj {{#if this.selected}}rc-choisi{{/if}}" data-action="toggleToken" data-actor-uuid="{{this.actorUuid}}" data-search="{{this.name}}">
+                <img src="{{this.img}}" alt=""><span>{{this.name}}</span><i class="fa-solid {{#if this.selected}}fa-check{{else}}fa-plus{{/if}}"></i>
+              </button>
+            {{else}}
+              <p class="rc-vide">{{localize "ROLLENSEMBLECOC7.Config.NoTokens"}}</p>
+            {{/each}}
+          </div>
+        </div>
+      {{/if}}
+
+      {{!-- 2. Quel jet ? --}}
+      <div class="rc-titre"><span class="rc-num">2</span> {{localize "ROLLENSEMBLECOC7.Config.QuelJet"}}</div>
+      {{#if hasParticipants}}
+        {{#if quick.length}}
+          <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.Courantes"}}</div>
+          <div class="rc-puces">
+            {{#each quick}}
+              <button type="button" class="rc-puce rc-puce-grande {{#if this.selected}}rc-actif{{/if}}" data-action="selectSkill" data-skill-kind="skill" data-skill-label="{{this.label}}">{{this.label}}</button>
+            {{/each}}
+          </div>
+        {{/if}}
+        <div class="rc-deux">
+          <div>
+            <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.SpecialHeader"}}</div>
+            <div class="rc-puces">
+              {{#each specials}}
+                <button type="button" class="rc-puce {{#if this.selected}}rc-actif{{/if}}" data-action="selectSkill" data-skill-kind="special" data-skill-key="{{this.key}}">{{this.label}}</button>
+              {{/each}}
+            </div>
+          </div>
+          <div>
+            <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.CharacteristicsHeader"}} <small>×5</small></div>
+            <div class="rc-puces">
+              {{#each chars}}
+                <button type="button" class="rc-puce rc-puce-petite {{#if this.selected}}rc-actif{{/if}}" data-action="selectSkill" data-skill-kind="char" data-skill-key="{{this.key}}">{{this.label}}</button>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+        <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.ToutesComp"}}
+          <input type="search" class="rc-recherche rc-recherche-comp" placeholder="{{localize 'ROLLENSEMBLECOC7.Config.ChercherComp'}}" />
+        </div>
+        <div class="rc-comp-liste">
+          {{#each skills}}
+            <button type="button" class="rc-comp {{#if this.selected}}rc-actif{{/if}} {{#unless this.all}}rc-partiel{{/unless}}" data-action="selectSkill" data-skill-kind="skill" data-skill-label="{{this.label}}" data-search="{{this.search}}" title="{{this.count}} / {{../selected.length}}">
+              {{this.label}}{{#unless this.all}} <small>{{this.count}}/{{../selected.length}}</small>{{/unless}}
+            </button>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="rc-vide rc-vide-grand"><i class="fa-solid fa-arrow-up"></i> {{localize "ROLLENSEMBLECOC7.Config.PickActorsFirst"}}</p>
+      {{/if}}
+    </section>
+
+    {{!-- 3. Réglages --}}
+    <section class="rc-droite">
+      <div class="rc-titre"><span class="rc-num">3</span> {{localize "ROLLENSEMBLECOC7.Config.RollOptions"}}</div>
+      <div class="rc-jet-choisi {{#unless selectedSkillLabel}}rc-sans{{/unless}}">
+        {{#if selectedSkillLabel}}{{selectedSkillLabel}}{{else}}{{localize "ROLLENSEMBLECOC7.Config.NoSkillSelected"}}{{/if}}
+      </div>
+
+      <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.Difficulty"}}</div>
+      <div class="rc-tuiles">
+        {{#each difficulties}}
+          <button type="button" class="rc-tuile {{#if this.actif}}rc-actif{{/if}}" data-action="setDifficulty" data-value="{{this.v}}">{{this.label}}</button>
+        {{/each}}
+      </div>
+
+      <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.DesTous"}}</div>
+      <div class="rc-crans">
+        {{#each globalCrans}}
+          <button type="button" class="rc-cran rc-{{this.cls}} {{#if this.actif}}rc-actif{{/if}}" data-action="setGlobalDice" data-value="{{this.v}}" title="{{this.label}}">
+            {{#if this.n}}{{#if (eq this.cls "malus")}}−{{else}}+{{/if}}{{this.n}} <i class="fa-solid fa-dice-d10"></i>{{else}}{{this.label}}{{/if}}
+          </button>
+        {{/each}}
+      </div>
+
+      <button type="button" class="rc-interrupteur {{#if teams}}rc-actif{{/if}}" data-action="toggleTeams">
+        <span class="rc-bascule"></span> {{localize "ROLLENSEMBLECOC7.Config.Teams"}}
       </button>
-    </div>
+
+      <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.Participants"}} <span class="rc-badge">{{selected.length}}</span></div>
+      <div class="rc-participants">
+        {{#each selected}}
+          <div class="rc-part" data-key="{{this.key}}">
+            <img src="{{this.img}}" alt="">
+            <div class="rc-part-info">
+              <div class="rc-part-ligne1">
+                <span class="rc-part-nom">{{this.name}}</span>
+                {{#if ../selectedSkillLabel}}<span class="rc-part-score {{#if (eq this.score null)}}rc-absent{{/if}}" title="{{#if (eq this.score null)}}{{localize 'ROLLENSEMBLECOC7.Config.NoSkillOnSheet'}}{{/if}}">{{#if (eq this.score null)}}—{{else}}{{this.effectif}} %{{/if}}</span>{{/if}}
+              </div>
+              <div class="rc-part-ligne2">
+                <div class="rc-mini-crans">
+                  {{#each this.crans}}
+                    <button type="button" class="rc-{{this.cls}} {{#if this.actif}}rc-actif{{/if}}" data-action="setDice" data-key="{{../key}}" data-value="{{this.v}}">{{#if this.n}}{{#if (eq this.cls "malus")}}−{{else}}+{{/if}}{{this.n}}{{else}}0{{/if}}</button>
+                  {{/each}}
+                </div>
+                <input type="number" name="modifier-{{this.key}}" value="{{this.modifier}}" step="5" title="{{localize 'ROLLENSEMBLECOC7.Config.Modifier'}}" placeholder="±%" />
+                {{#if ../teams}}<button type="button" class="rc-equipe rc-equipe-{{this.team}}" data-action="setTeam" data-key="{{this.key}}">{{this.team}}</button>{{/if}}
+                {{#if this.canRequest}}
+                  <button type="button" class="rc-envoi {{#if this.willRequest}}rc-actif{{/if}}" data-action="toggleForceGM" data-key="{{this.key}}" title="{{#if this.willRequest}}{{localize 'ROLLENSEMBLECOC7.Config.WillRequestTitle'}} ({{this.ownerNames}}){{else}}{{localize 'ROLLENSEMBLECOC7.Config.WillGMTitle'}}{{/if}}"><i class="fa-solid {{#if this.willRequest}}fa-paper-plane{{else}}fa-user-shield{{/if}}"></i></button>
+                {{/if}}
+              </div>
+            </div>
+            <button type="button" class="rc-retirer" data-action="toggleToken" data-actor-uuid="{{this.actorUuid}}" title="{{localize 'ROLLENSEMBLECOC7.Config.Remove'}}"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        {{else}}
+          <p class="rc-vide">{{localize "ROLLENSEMBLECOC7.Config.NoParticipants"}}</p>
+        {{/each}}
+      </div>
+
+      <div class="rc-boutons">
+        <button type="button" class="rc-go rc-go-joueurs" data-action="sendRequest" title="{{localize 'ROLLENSEMBLECOC7.Config.SendRequestHint'}}" {{#unless nbRequetes}}disabled{{/unless}}>
+          <i class="fa-solid fa-paper-plane"></i> {{localize "ROLLENSEMBLECOC7.Config.SendRequest"}}{{#if nbRequetes}} ({{nbRequetes}}){{/if}}
+        </button>
+        <button type="button" class="rc-go rc-go-lancer" data-action="launch" title="{{localize 'ROLLENSEMBLECOC7.Config.LaunchHint'}}">
+          <i class="fa-solid fa-dice-d10"></i> {{localize "ROLLENSEMBLECOC7.Config.Launch"}}
+        </button>
+      </div>
+    </section>
   </div>
 </div>

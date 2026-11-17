@@ -21,7 +21,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       icon: "fa-solid fa-dice-d10",
       resizable: true
     },
-    position: { width: 860, height: 620 },
+    position: { width: 1060, height: 720 },
     form: {
       handler: RollConfigApp.#onSubmit,
       submitOnChange: false,
@@ -32,7 +32,15 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       selectSkill: RollConfigApp.#onSelectSkill,
       toggleForceGM: RollConfigApp.#onToggleForceGM,
       launch: RollConfigApp.#onLaunch,
-      sendRequest: RollConfigApp.#onSendRequest
+      sendRequest: RollConfigApp.#onSendRequest,
+      setDifficulty: function (e, t) { this.#sync(); this.difficulty = t.dataset.value; this.render(); },
+      setGlobalDice: function (e, t) { this.#sync(); this.globalDice = Number(t.dataset.value); for (const p of this.participants) p.dice = this.globalDice; this.render(); },
+      setDice: function (e, t) { this.#sync(); const p = this.participants.find(x => x.key === t.dataset.key); if (p) p.dice = Number(t.dataset.value); this.render(); },
+      setTeam: function (e, t) { this.#sync(); const p = this.participants.find(x => x.key === t.dataset.key); if (p) p.team = p.team === "A" ? "B" : "A"; this.render(); },
+      toggleTeams: function () { this.#sync(); this.teams = !this.teams; this.render(); },
+      toggleNpc: function () { this.#sync(); this.npcOpen = !this.npcOpen; this.render(); },
+      addAllPlayers: RollConfigApp.#onAddAllPlayers,
+      clearAll: function () { this.participants = []; this.render(); }
     }
   };
 
@@ -45,70 +53,60 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   teams = false;
   label = "";
   difficulty = "none"; // "none" | "regular" | "hard" | "extreme"
-  globalDice = 0; // dés bonus/malus par défaut appliqués à tous
+  globalDice = 0; // dés bonus/malus appliqués à tous
+  npcOpen = false;
   search = "";
   /** @type {{kind: "skill"|"char"|"special", label: string, key?: string}|null} */
   selectedSkill = null;
 
   async _prepareContext() {
-    const resolvedActors = await Promise.all(
-      this.participants.map(p => (p.actorUuid ? fromUuid(p.actorUuid) : null))
-    );
+    const L = (k) => game.i18n.localize(`ROLLENSEMBLECOC7.${k}`);
+    const resolvedActors = await Promise.all(this.participants.map(p => (p.actorUuid ? fromUuid(p.actorUuid) : null)));
+    const choisi = (uuid) => this.participants.some(p => p.actorUuid === uuid);
 
-    // Liste unique (dédupliquée) des compétences présentes chez au moins un participant sélectionné
-    const skillLabels = new Set();
-    resolvedActors.forEach(actor => {
-      getActorSkills(actor).forEach(s => skillLabels.add(s.label));
-    });
-    const skillOptions = [...skillLabels].sort((a, b) => a.localeCompare(b)).map(label => ({
-      label,
-      selected: this.selectedSkill?.kind === "skill" && this.selectedSkill.label === label
-    }));
-
-    const charOptions = CHARACTERISTICS.map(c => ({
-      key: c.key,
-      label: c.label,
-      selected: this.selectedSkill?.kind === "char" && this.selectedSkill.key === c.key
-    }));
-
-    const specialOptions = SPECIAL_ATTRIBUTES.map(c => ({
-      key: c.key,
-      label: c.label,
-      selected: this.selectedSkill?.kind === "special" && this.selectedSkill.key === c.key
-    }));
-
-    // Tokens de la scène non encore sélectionnés, pour la colonne "Disponibles"
+    // --- Personnages joueurs : personnages attribués aux joueurs + jetons joueurs de la scène
     const placeables = (canvas.tokens?.placeables ?? []).filter(t => t.actor);
-    const available = placeables
-      .filter(t => !this.participants.some(p => p.actorUuid === t.actor.uuid))
-      .map(t => ({
-        actorUuid: t.actor.uuid,
-        name: t.name || t.actor.name,
-        img: t.document.texture?.src || t.actor.img,
-        sub: t.actor.hasPlayerOwner
-          ? game.i18n.localize("ROLLENSEMBLECOC7.Config.PC")
-          : game.i18n.localize("ROLLENSEMBLECOC7.Config.NPC")
-      }))
+    const joueurs = new Map();
+    for (const u of game.users.filter(u => !u.isGM && u.character)) {
+      const a = u.character;
+      joueurs.set(a.uuid, { actorUuid: a.uuid, name: a.name, img: a.img, actor: a });
+    }
+    for (const t of placeables.filter(t => t.actor.hasPlayerOwner)) {
+      if (!joueurs.has(t.actor.uuid)) joueurs.set(t.actor.uuid, { actorUuid: t.actor.uuid, name: t.name || t.actor.name, img: t.actor.img || t.document.texture?.src, actor: t.actor });
+    }
+    const players = [...joueurs.values()]
+      .map(j => ({ ...j, actor: undefined, selected: choisi(j.actorUuid), online: getActiveOwners(j.actor).length > 0, score: this.#scoreDe(j.actor) }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    // Grille dédiée : uniquement les tokens de personnages joueurs présents sur la scène,
-    // pour une sélection rapide en un clic (indépendante de la recherche "Disponibles")
-    const playerTokens = placeables
-      .filter(t => t.actor.hasPlayerOwner)
-      .map(t => ({
-        actorUuid: t.actor.uuid,
-        name: t.name || t.actor.name,
-        img: t.document.texture?.src || t.actor.img,
-        selected: this.participants.some(p => p.actorUuid === t.actor.uuid)
-      }))
+    // --- PNJ et autres jetons de la scène
+    const npcs = placeables
+      .filter(t => !joueurs.has(t.actor.uuid))
+      .map(t => ({ actorUuid: t.actor.uuid, name: t.name || t.actor.name, img: t.document.texture?.src || t.actor.img, selected: choisi(t.actor.uuid) }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
+    // --- Compétences des participants sélectionnés (combien l'ont)
+    const compte = new Map();
+    resolvedActors.forEach(actor => getActorSkills(actor).forEach(sk => compte.set(sk.label, (compte.get(sk.label) ?? 0) + 1)));
+    const n = this.participants.length;
+    const estChoisie = (kind, val) => this.selectedSkill?.kind === kind && (kind === "skill" ? this.selectedSkill.label === val : this.selectedSkill.key === val);
+    const skills = [...compte.entries()].map(([label, c]) => ({ label, count: c, all: c === n, selected: estChoisie("skill", label), search: label.toLowerCase() }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    const COURANTES = ["trouver objet caché", "écouter", "discrétion", "bibliothèque", "psychologie", "esquive", "persuasion", "baratin", "premiers soins", "grimper", "sauter", "nager", "spot hidden", "listen", "stealth", "library use", "dodge"];
+    const quick = COURANTES.map(c => skills.find(s => s.search === c)).filter(Boolean);
+    const specials = SPECIAL_ATTRIBUTES.map(c => ({ ...c, selected: estChoisie("special", c.key) }));
+    const chars = CHARACTERISTICS.map(c => ({ ...c, selected: estChoisie("char", c.key) }));
+
+    // --- Participants sélectionnés, avec leur score pour le jet choisi
     const selected = this.participants.map((p, i) => {
       const actor = resolvedActors[i];
       const owners = actor ? getActiveOwners(actor) : [];
+      const score = this.#scoreDe(actor);
       return {
         ...p,
         img: actor?.img ?? p.img,
+        score,
+        effectif: score === null ? null : Math.max(0, Math.min(100, score + (p.modifier || 0))),
+        crans: [-2, -1, 0, 1, 2].map(v => ({ v, actif: p.dice === v, cls: v < 0 ? "malus" : v > 0 ? "bonus" : "normal", n: Math.abs(v) })),
         canRequest: owners.length > 0,
         willRequest: owners.length > 0 && !p.forceGM,
         ownerNames: owners.map(u => u.name).join(", ")
@@ -116,19 +114,39 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     });
 
     return {
+      theme: themeActif(),
       label: this.label,
       teams: this.teams,
-      difficulty: this.difficulty,
-      globalDice: this.globalDice,
+      npcOpen: this.npcOpen,
+      players, npcs, selected,
+      skills, quick, specials, chars,
+      hasParticipants: n > 0,
       selectedSkillLabel: this.#skillDisplayLabel(),
-      available,
-      playerTokens,
-      selected,
-      skillOptions,
-      charOptions,
-      specialOptions,
-      hasParticipants: selected.length > 0
+      difficulties: ["none", "regular", "hard", "extreme"].map(v => ({ v, actif: this.difficulty === v, label: v === "none" ? L("Config.DiffAucune") : L(`Level.${v}`) })),
+      globalCrans: [-2, -1, 0, 1, 2].map(v => ({ v, actif: this.globalDice === v, cls: v < 0 ? "malus" : v > 0 ? "bonus" : "normal", n: Math.abs(v),
+        label: v === 0 ? L("Config.Dice.Normal") : L(`Config.Dice.${v > 0 ? "P" : "M"}${Math.abs(v)}`) })),
+      nbRequetes: selected.filter(p => p.willRequest).length
     };
+  }
+
+  /** Score de base d'un acteur pour le jet choisi (null s'il n'a pas la compétence). */
+  #scoreDe(actor) {
+    if (!actor || !this.selectedSkill) return null;
+    if (this.selectedSkill.kind === "char") return getCharacteristicValue(actor, this.selectedSkill.key) * 5;
+    if (this.selectedSkill.kind === "special") return getSpecialAttributeValue(actor, this.selectedSkill.key);
+    return getSkillValueByLabel(actor, this.selectedSkill.label);
+  }
+
+  /** Relit les champs saisis (nom du lancer, modificateurs) avant de redessiner. */
+  #sync() {
+    const el = this.element;
+    if (!el) return;
+    const label = el.querySelector('[name="label"]');
+    if (label) this.label = label.value;
+    for (const p of this.participants) {
+      const m = el.querySelector(`[name="modifier-${p.key}"]`);
+      if (m) p.modifier = Number(m.value) || 0;
+    }
   }
 
   #skillDisplayLabel() {
@@ -166,25 +184,34 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   _onRender(context, options) {
     super._onRender?.(context, options);
 
-    const dropZone = this.element.querySelector(".re-dropzone");
-    if (dropZone) {
-      dropZone.addEventListener("dragover", (ev) => ev.preventDefault());
-      dropZone.addEventListener("drop", this._onDrop.bind(this));
+    // Glisser un acteur ou un jeton n'importe où sur la fenêtre l'ajoute
+    if (!this._depotPret) {
+      this._depotPret = true;
+      this.element.addEventListener("dragover", (ev) => ev.preventDefault());
+      this.element.addEventListener("drop", this._onDrop.bind(this));
     }
 
-    // Filtrage en direct de la colonne "Disponibles" sans re-render complet
-    const searchInput = this.element.querySelector(".re-search-input");
-    if (searchInput) {
-      searchInput.value = this.search;
-      searchInput.addEventListener("input", (ev) => {
-        this.search = ev.target.value;
-        const needle = this.search.trim().toLowerCase();
-        this.element.querySelectorAll(".re-available-list .re-actor-row").forEach(row => {
-          const name = row.dataset.name ?? "";
-          row.style.display = !needle || name.includes(needle) ? "" : "none";
-        });
-      });
-    }
+    // Habillage : thème d'époque de la bannière
+    const theme = context.theme ?? "classique";
+    this.element.classList.remove(...[...this.element.classList].filter(c => c.startsWith("re-t-")));
+    this.element.classList.add("re-cfg", `re-t-${theme}`);
+
+    // Recherche en direct (compétences et PNJ), sans redessiner
+    const filtre = (input, selecteur) => {
+      if (!input) return;
+      const appliquer = () => {
+        const q = input.value.trim().toLowerCase();
+        this.element.querySelectorAll(selecteur).forEach(el => { el.hidden = !!q && !(el.dataset.search ?? "").includes(q); });
+      };
+      input.addEventListener("input", appliquer);
+      appliquer();
+    };
+    const rs = this.element.querySelector(".rc-recherche-comp");
+    if (rs) { rs.value = this.searchSkill ?? ""; rs.addEventListener("input", () => { this.searchSkill = rs.value; }); }
+    filtre(rs, ".rc-comp-liste .rc-comp");
+    const rp = this.element.querySelector(".rc-recherche-pnj");
+    if (rp) { rp.value = this.search ?? ""; rp.addEventListener("input", () => { this.search = rp.value; }); }
+    filtre(rp, ".rc-pnj-liste .rc-pnj");
   }
 
   async _onDrop(event) {
@@ -205,7 +232,9 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       actor = token?.actor ?? token?.document?.actor;
     }
     if (!actor) return;
+    this.#sync();
     this.#addActor(actor);
+    this.npcOpen ||= !actor.hasPlayerOwner;
     this.render();
   }
 
@@ -228,6 +257,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static #onToggleToken(event, target) {
+    this.#sync();
     const actorUuid = target.closest("[data-actor-uuid]")?.dataset.actorUuid;
     if (!actorUuid) return;
     (async () => {
@@ -242,7 +272,19 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     })();
   }
 
+  static async #onAddAllPlayers() {
+    this.#sync();
+    const ctx = await this._prepareContext();
+    for (const j of ctx.players) {
+      if (this.participants.some(p => p.actorUuid === j.actorUuid)) continue;
+      const actor = await fromUuid(j.actorUuid);
+      if (actor) this.#addActor(actor);
+    }
+    this.render();
+  }
+
   static #onSelectSkill(event, target) {
+    this.#sync();
     const kind = target.dataset.skillKind;
     if (kind === "char") {
       this.selectedSkill = { kind: "char", key: target.dataset.skillKey };
@@ -255,6 +297,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static #onToggleForceGM(event, target) {
+    this.#sync();
     const key = target.closest("[data-key]")?.dataset.key;
     const p = this.participants.find(p => p.key === key);
     if (p) p.forceGM = !p.forceGM;
@@ -262,17 +305,9 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onSubmit(event, form, formData) {
-    const data = formData.object;
-    this.label = data.label ?? this.label;
-    this.teams = !!data.teams;
-    this.difficulty = data.difficulty ?? this.difficulty;
-    this.globalDice = Number(data.globalDice) || 0;
-    for (const p of this.participants) {
-      if (data[`modifier-${p.key}`] !== undefined) p.modifier = Number(data[`modifier-${p.key}`]) || 0;
-      if (data[`dice-${p.key}`] !== undefined) p.dice = Number(data[`dice-${p.key}`]) || 0;
-      if (data[`team-${p.key}`] !== undefined) p.team = data[`team-${p.key}`];
-    }
+    this.#sync();
   }
+
 
   /** Résout la base + valeur effective de la compétence/caractéristique choisie pour un participant. */
   async #resolveEffectiveSkill(p, actor) {
@@ -323,9 +358,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
    * actuellement sélectionnés, sans passer par une requête joueur.
    */
   static async #onLaunch(event, target) {
-    const form = this.element;
-    const formData = new foundry.applications.ux.FormDataExtended(form);
-    await RollConfigApp.#onSubmit.call(this, event, form, formData);
+    this.#sync();
     if (!(await this.#checkReady())) return;
 
     const requiredRank = this.difficulty !== "none" ? RANK[this.difficulty] : null;
@@ -371,9 +404,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
    * Les autres participants de la liste sont ignorés par cette action.
    */
   static async #onSendRequest(event, target) {
-    const form = this.element;
-    const formData = new foundry.applications.ux.FormDataExtended(form);
-    await RollConfigApp.#onSubmit.call(this, event, form, formData);
+    this.#sync();
     if (!(await this.#checkReady())) return;
 
     const requiredRank = this.difficulty !== "none" ? RANK[this.difficulty] : null;
