@@ -1,7 +1,7 @@
 import { determineWinners } from "./coc7.js";
 import { broadcast } from "./socket.js";
 import { postChatRecap } from "./chat-recap.js";
-import { SpectatorApp } from "../apps/SpectatorApp.js";
+import { finaliserAffichage } from "./affichage.js";
 
 /** @type {Map<string, {payload: object, pendingKeys: Set<string>}>} */
 const pendingRolls = new Map();
@@ -39,7 +39,7 @@ export async function handleRollResponse(data) {
   if (entry.pendingKeys.size === 0) {
     entry.payload.winners = determineWinners(entry.payload.participants, entry.payload.teams);
     broadcast("results-final", entry.payload);
-    SpectatorApp.finalizeAny(entry.payload); // le MJ ne reçoit pas ses propres broadcasts
+    finaliserAffichage(entry.payload); // le MJ ne reçoit pas ses propres broadcasts
     await postChatRecap(entry.payload);
     pendingRolls.delete(data.rollId);
   }

@@ -1,7 +1,7 @@
 import { MODULE_ID } from "../settings.js";
 import { rollPercentile, successLevel, RANK } from "../lib/coc7.js";
 import { broadcast } from "../lib/socket.js";
-import { SpectatorApp } from "./SpectatorApp.js";
+import { appliquerResultat } from "../lib/affichage.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -56,7 +56,7 @@ export class RollRequestApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
     // Applique localement (le MJ et les autres clients recevront le broadcast,
     // mais celui-ci n'atteint pas l'émetteur lui-même)
-    SpectatorApp.applyResult(result);
+    appliquerResultat(result);
     broadcast("roll-response", result);
 
     ui.notifications.info(game.i18n.format("ROLLENSEMBLECOC7.Request.Rolled", { roll, name: this.data.name }));

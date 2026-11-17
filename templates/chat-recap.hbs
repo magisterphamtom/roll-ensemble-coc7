@@ -1,20 +1,26 @@
-<div class="re-chat-recap">
-  <h3><i class="fa-solid fa-dice-d10"></i> {{label}}</h3>
-  <table>
-    <tbody>
-      {{#each participants}}
-        <tr class="{{#if this.isWinner}}re-chat-winner{{/if}}">
-          <td class="re-chat-name"><img src="{{this.img}}" /> {{this.name}}{{#if ../teams}} <span class="re-chat-team">({{this.team}})</span>{{/if}}</td>
-          <td class="re-chat-skill">{{this.skillLabel}} ({{this.effectiveSkill}}%)</td>
-          <td class="re-chat-roll">{{this.roll}}</td>
-          <td class="re-chat-level re-chat-level-{{this.level}}">{{localize (concat "ROLLENSEMBLECOC7.Level." this.level)}}</td>
-          {{#if this.hasThreshold}}
-            <td class="re-chat-threshold {{#if this.meetsThreshold}}re-threshold-pass{{else}}re-threshold-fail{{/if}}">
-              {{#if this.meetsThreshold}}{{localize "ROLLENSEMBLECOC7.Threshold.Success"}}{{else}}{{localize "ROLLENSEMBLECOC7.Threshold.Failure"}}{{/if}}
-            </td>
-          {{/if}}
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
+<div class="re-carte">
+  <header class="re-carte-tete">
+    <i class="fa-solid fa-dice-d10 re-carte-de"></i>
+    <div class="re-carte-titres">
+      <h3>{{label}}</h3>
+      {{#if sous}}<span class="re-carte-sous">{{sous}}</span>{{/if}}
+    </div>
+    {{#unless teams}}<div class="re-carte-compte" title="{{localize 'ROLLENSEMBLECOC7.Bilan.Compte'}}">{{bilan.ok}}<small>/{{bilan.total}}</small></div>{{/unless}}
+  </header>
+  <ol class="re-carte-liste">
+    {{#each lignes}}
+      <li class="re-carte-ligne re-{{this.etat}} {{#if this.gagnant}}re-gagnant{{/if}}">
+        <div class="re-carte-portrait"><img src="{{this.img}}" alt="">{{#if this.gagnant}}<i class="fa-solid fa-crown"></i>{{/if}}</div>
+        <div class="re-carte-qui">
+          <span class="re-carte-nom">{{this.name}}{{#if ../teams}} <span class="re-carte-equipe">{{this.team}}</span>{{/if}}</span>
+          <span class="re-carte-score">{{this.effectiveSkill}} %{{{this.des}}}</span>
+        </div>
+        <div class="re-carte-jet">{{this.jet}}</div>
+        <div class="re-carte-etat" title="{{this.niveau}}"><i class="{{this.icone}}"></i><span>{{this.niveau}}</span></div>
+      </li>
+    {{/each}}
+  </ol>
+  {{#if bilan.verdict}}
+    <footer class="re-carte-verdict {{#if toutOk}}re-ok{{/if}}{{#if aucunOk}}re-ko{{/if}}">{{bilan.verdict}}</footer>
+  {{/if}}
 </div>

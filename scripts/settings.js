@@ -1,6 +1,25 @@
 export const MODULE_ID = "roll-ensemble-coc7";
 
 export function registerSettings() {
+  game.settings.register(MODULE_ID, "affichage", {
+    name: "ROLLENSEMBLECOC7.Settings.Affichage",
+    hint: "ROLLENSEMBLECOC7.Settings.AffichageHint",
+    scope: "world",
+    config: true,
+    type: String,
+    choices: { banniere: "ROLLENSEMBLECOC7.Settings.AffichageBanniere", fenetre: "ROLLENSEMBLECOC7.Settings.AffichageFenetre" },
+    default: "banniere"
+  });
+
+  game.settings.register(MODULE_ID, "effetsCritiques", {
+    name: "ROLLENSEMBLECOC7.Settings.EffetsCritiques",
+    hint: "ROLLENSEMBLECOC7.Settings.EffetsCritiquesHint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
   game.settings.register(MODULE_ID, "playSound", {
     name: "ROLLENSEMBLECOC7.Settings.PlaySound",
     hint: "ROLLENSEMBLECOC7.Settings.PlaySoundHint",

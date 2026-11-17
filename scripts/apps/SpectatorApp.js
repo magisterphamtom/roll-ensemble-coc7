@@ -1,5 +1,7 @@
 import { MODULE_ID } from "../settings.js";
 import { LEVEL_COLOR } from "../lib/coc7.js";
+import { effetCritique } from "../lib/effets.js";
+import { graine } from "../lib/resultat.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -141,6 +143,12 @@ export class SpectatorApp extends HandlebarsApplicationMixin(ApplicationV2) {
     row.classList.remove("re-pending");
     row.classList.add("re-revealed", `re-level-${participant.level}`);
     if (participant.noSkill) row.classList.add("re-no-skill");
+    this.effetsJoues ??= new Set();
+    if ((participant.level === "critical" || participant.level === "fumble") && !this.effetsJoues.has(participant.key)) {
+      this.effetsJoues.add(participant.key);
+      effetCritique({ kind: participant.level, actorUuid: participant.actorUuid, nom: participant.name, img: participant.img,
+        libelle: this.payload.label, resultat: participant.roll, graine: graine(this.payload.id + participant.key) });
+    }
   }
 
   /**

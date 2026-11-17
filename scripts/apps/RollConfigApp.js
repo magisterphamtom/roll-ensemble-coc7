@@ -7,7 +7,7 @@ import {
 } from "../lib/actor-skills.js";
 import { registerPendingRoll } from "../lib/roll-manager.js";
 import { postChatRecap } from "../lib/chat-recap.js";
-import { SpectatorApp } from "./SpectatorApp.js";
+import { ouvrirAffichage } from "../lib/affichage.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -354,8 +354,10 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     };
 
     broadcast("start", payload);
-    new SpectatorApp(payload).render(true);
-    await postChatRecap(payload);
+    ouvrirAffichage(payload);
+    // La carte du chat arrive quand l'animation a révélé tout le monde
+    const attente = payload.rollDurationMs + Math.max(0, participants.length - 1) * payload.staggerMs + 400;
+    setTimeout(() => postChatRecap(payload), attente);
 
     this.close();
   }
@@ -417,7 +419,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     };
 
     broadcast("start", payload);
-    new SpectatorApp(payload).render(true);
+    ouvrirAffichage(payload);
 
     registerPendingRoll(payload, requests.map(r => r.key));
     for (const req of requests) broadcast("roll-request", req);

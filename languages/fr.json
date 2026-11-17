@@ -1,6 +1,6 @@
 {
   "ROLLENSEMBLECOC7": {
-    "Title": "Roll Ensemble CoC7",
+    "Title": "Lancer de groupe CoC7",
     "ChatButton": "Lancer Groupé CoC7",
     "Config": {
       "Title": "Nouveau Lancer Groupé — CoC7",
@@ -85,7 +85,7 @@
       "Failure": "Échoué"
     },
     "Level": {
-      "fumble": "Échec Critique",
+      "fumble": "Maladresse",
       "fail": "Échec",
       "regular": "Réussite Normale",
       "hard": "Réussite Difficile",
@@ -106,7 +106,28 @@
       "StaggerDelay": "Délai entre chaque participant (ms)",
       "StaggerDelayHint": "Décalage de révélation entre chaque participant",
       "AutoClose": "Fermeture automatique (secondes)",
-      "AutoCloseHint": "0 = fermeture manuelle"
+      "AutoCloseHint": "0 = fermeture manuelle",
+      "Affichage": "Affichage du lancer",
+      "AffichageHint": "Bannière : bandeau avec les portraits chez tout le monde, chaque joueur lance depuis son portrait. Fenêtre : l'ancienne présentation (petite fenêtre et requête séparée).",
+      "AffichageBanniere": "Bannière (portraits)",
+      "AffichageFenetre": "Fenêtre (ancienne présentation)",
+      "EffetsCritiques": "Effets des 01 et maladresses",
+      "EffetsCritiquesHint": "Affiche les cartes plein écran du module Critiques du Mythe (s'il est actif) sur une réussite critique ou une maladresse."
+    },
+    "Banniere": {
+      "Kicker": "Lancer de groupe",
+      "Lancer": "Lancer !",
+      "LancerMJ": "Lancer à sa place",
+      "Attente": "En attente…",
+      "Difficulte": "Difficulté"
+    },
+    "Bilan": {
+      "Tous": "Tout le groupe réussit !",
+      "Reussi": "Jet réussi !",
+      "Aucun": "Personne ne réussit…",
+      "Rate": "Jet raté…",
+      "Certains": "{ok} réussite(s) sur {total}",
+      "Compte": "Réussites"
     }
   }
 }

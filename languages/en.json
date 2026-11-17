@@ -106,7 +106,28 @@
       "StaggerDelay": "Delay between participants (ms)",
       "StaggerDelayHint": "Reveal offset between each participant",
       "AutoClose": "Auto-close (seconds)",
-      "AutoCloseHint": "0 = manual close"
+      "AutoCloseHint": "0 = manual close",
+      "Affichage": "Roll display",
+      "AffichageHint": "Banner: a band with portraits for everyone, each player rolls from their portrait. Window: the former layout.",
+      "AffichageBanniere": "Banner (portraits)",
+      "AffichageFenetre": "Window (former layout)",
+      "EffetsCritiques": "Critical and fumble effects",
+      "EffetsCritiquesHint": "Shows Critiques du Mythe full-screen cards (if active) on criticals and fumbles."
+    },
+    "Banniere": {
+      "Kicker": "Group roll",
+      "Lancer": "Roll!",
+      "LancerMJ": "Roll for them",
+      "Attente": "Waiting…",
+      "Difficulte": "Difficulty"
+    },
+    "Bilan": {
+      "Tous": "The whole group succeeds!",
+      "Reussi": "Success!",
+      "Aucun": "Nobody succeeds…",
+      "Rate": "Failed…",
+      "Certains": "{ok} success(es) out of {total}",
+      "Compte": "Successes"
     }
   }
 }

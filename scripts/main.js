@@ -2,7 +2,7 @@ import { MODULE_ID, registerSettings } from "./settings.js";
 import { initSocket } from "./lib/socket.js";
 import { handleRollResponse } from "./lib/roll-manager.js";
 import { RollConfigApp } from "./apps/RollConfigApp.js";
-import { SpectatorApp } from "./apps/SpectatorApp.js";
+import { ouvrirAffichage, appliquerResultat, finaliserAffichage, enBanniere } from "./lib/affichage.js";
 import { RollRequestApp } from "./apps/RollRequestApp.js";
 
 Hooks.once("init", () => {
@@ -11,21 +11,20 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   initSocket({
-    start: (payload) => {
-      new SpectatorApp(payload).render(true);
-    },
+    start: (payload) => ouvrirAffichage(payload),
     "roll-request": (data) => {
       if (data.userIds?.includes(game.user.id)) {
-        new RollRequestApp(data).render(true);
+        // Bannière : le joueur lance depuis son portrait ; sinon, l'ancienne petite fenêtre
+        if (!enBanniere()) new RollRequestApp(data).render(true);
         ui.notifications.info(game.i18n.format("ROLLENSEMBLECOC7.Request.Notification", { name: data.name }));
       }
     },
     "roll-response": (data) => {
-      SpectatorApp.applyResult(data);
+      appliquerResultat(data);
       if (game.user.isGM) handleRollResponse(data);
     },
     "results-final": (payload) => {
-      SpectatorApp.finalizeAny(payload);
+      finaliserAffichage(payload);
     }
   });
 

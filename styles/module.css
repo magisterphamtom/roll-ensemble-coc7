@@ -612,3 +612,144 @@
 .re-player-grid {
   max-height: 110px;
 }
+
+/* =====================================================================
+   1.1 — Bannière de lancer (chez tout le monde) et nouvelle carte de chat.
+   Couleurs et polices : celles du thème des cartes de chat (--c7cc-*)
+   quand le module coc7-cartes-chat est actif ; sinon une palette Années 20.
+   ===================================================================== */
+.re-banniere, .re-carte {
+  --b-bg: var(--c7cc-bg, linear-gradient(180deg, #211a11, #14100b));
+  --b-plain: var(--c7cc-bg-plain, #18130d);
+  --b-ink: var(--c7cc-ink, #efe3c6);
+  --b-dim: var(--c7cc-ink-dim, #b9a984);
+  --b-accent: var(--c7cc-accent, #ecd08a);
+  --b-border: var(--c7cc-border, #c9a24a);
+  --b-border2: var(--c7cc-border-outer, #7d6128);
+  --b-title: var(--c7cc-font-title, "EB Garamond", Georgia, serif);
+  --b-label: var(--c7cc-font-label, "EB Garamond", Georgia, serif);
+  --b-ok: #5cc27a;
+  --b-ko: #e0524a;
+  --b-crit: #ffd34d;
+  --b-fumble: #ff3b3b;
+}
+
+/* ---------- Bannière ---------- */
+.re-banniere {
+  position: fixed; left: 0; right: 0; top: 12vh; z-index: 95;
+  display: flex; justify-content: center; pointer-events: none;
+}
+.re-b-bande {
+  pointer-events: auto; position: relative; max-width: 94vw; padding: 16px 34px 18px;
+  background: var(--b-bg); color: var(--b-ink);
+  border-top: 2px solid var(--b-border); border-bottom: 2px solid var(--b-border);
+  box-shadow: 0 0 0 4px rgba(0,0,0,.35), 0 0 0 5px var(--b-border2), 0 18px 50px rgba(0,0,0,.65);
+  clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 50%, calc(100% - 22px) 100%, 22px 100%, 0 50%);
+  transform: scaleX(.2); opacity: 0; transition: transform .35s cubic-bezier(.2,1.3,.4,1), opacity .25s;
+}
+.re-banniere.re-b-visible .re-b-bande { transform: none; opacity: 1; }
+.re-banniere.re-b-sortie .re-b-bande { transform: translateY(-30px); opacity: 0; transition: transform .4s, opacity .4s; }
+.re-b-fermer {
+  all: unset; position: absolute; top: 8px; right: 30px; cursor: pointer; color: var(--b-dim); font-size: 16px; padding: 4px;
+}
+.re-b-fermer:hover { color: var(--b-accent); }
+
+.re-b-tete { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px; }
+.re-b-de { width: 62px; height: 62px; flex: none; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--b-accent) 45%, transparent)); animation: re-b-de 2.4s ease-in-out infinite; }
+.re-b-de svg { width: 100%; height: 100%; }
+.re-de-face { fill: var(--b-plain); stroke: var(--b-accent); stroke-width: 3; stroke-linejoin: round; }
+.re-de-arete { fill: none; stroke: var(--b-accent); stroke-width: 1.6; opacity: .65; }
+.re-b-de text { fill: var(--b-accent); font: 700 26px var(--b-title); }
+@keyframes re-b-de { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg) translateY(-3px); } }
+
+.re-b-titres { text-align: center; }
+.re-b-kicker { font: 600 12px var(--b-label); letter-spacing: .25em; text-transform: uppercase; color: var(--b-dim); display: flex; gap: 8px; justify-content: center; align-items: center; }
+.re-b-titres h2 { margin: 2px 0; border: none; font: 400 30px/1.1 var(--b-title); color: var(--b-accent); text-shadow: 0 2px 6px rgba(0,0,0,.6); }
+.re-b-sous { font: 15px var(--b-label); color: var(--b-ink); opacity: .85; }
+
+.re-b-cartes { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.re-b-rang { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.re-b-equipe { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.re-b-equipe-nom { font: 600 12px var(--b-label); letter-spacing: .2em; text-transform: uppercase; color: var(--b-dim); }
+.re-b-vs { font: 34px var(--b-title); color: var(--b-accent); text-shadow: 0 0 12px color-mix(in srgb, var(--b-accent) 50%, transparent); }
+
+.re-b-carte {
+  width: 122px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 6px 7px;
+  background: rgba(0,0,0,.28); border: 1px solid var(--b-border2); border-radius: 6px; text-align: center;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.re-b-portrait { position: relative; width: 84px; height: 84px; }
+.re-b-portrait img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; border-radius: 50%; border: 2px solid var(--b-border); background: var(--b-plain); }
+.re-b-couronne { position: absolute; top: -10px; left: 50%; transform: translateX(-50%) scale(0); color: var(--b-crit); font-size: 20px; filter: drop-shadow(0 1px 2px #000); transition: transform .3s cubic-bezier(.2,1.6,.4,1); }
+.re-b-nom { font: 600 14px/1.15 var(--b-label); color: var(--b-ink); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.re-b-cible { font: 13px var(--b-label); color: var(--b-dim); display: flex; gap: 5px; align-items: center; }
+.re-b-note { font-size: 10px; color: var(--b-ko); }
+.re-b-zone { min-height: 38px; display: flex; align-items: center; justify-content: center; }
+.re-b-valeur { font: 34px/1 var(--b-title); color: var(--b-ink); font-variant-numeric: tabular-nums; }
+.re-b-tourne { opacity: .7; }
+.re-b-attente { font-size: 12px; color: var(--b-dim); font-style: italic; }
+.re-b-attente i { animation: re-b-sablier 1.6s linear infinite; }
+@keyframes re-b-sablier { 50% { transform: rotate(180deg); } }
+.re-b-etat { min-height: 17px; font: 600 12px var(--b-label); display: flex; align-items: center; gap: 4px; }
+
+.re-b-lancer {
+  all: unset; box-sizing: border-box; cursor: pointer; padding: 6px 10px; border-radius: 4px;
+  font: 600 13px var(--b-label); color: var(--b-dim); border: 1px solid var(--b-border2); background: rgba(0,0,0,.3);
+}
+.re-b-lancer:hover { color: var(--b-accent); border-color: var(--b-accent); }
+.re-b-lancer.re-b-moi { color: var(--b-plain); background: var(--b-accent); border-color: var(--b-accent); font-size: 15px; padding: 7px 14px; animation: re-b-pulse 1.2s ease-in-out infinite; }
+.re-b-lancer:disabled { opacity: .5; animation: none; }
+.re-b-a-moi { border-color: var(--b-accent); box-shadow: 0 0 14px color-mix(in srgb, var(--b-accent) 40%, transparent); }
+@keyframes re-b-pulse { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--b-accent) 25%, transparent); } }
+
+.re-b-revele { animation: re-b-pop .35s ease-out; }
+@keyframes re-b-pop { 40% { transform: scale(1.08); } }
+.re-b-ok { border-color: var(--b-ok); } .re-b-ok .re-b-etat { color: var(--b-ok); }
+.re-b-ko { border-color: var(--b-ko); } .re-b-ko .re-b-etat { color: var(--b-ko); } .re-b-ko .re-b-portrait img { filter: grayscale(.6) brightness(.8); }
+.re-b-crit { border-color: var(--b-crit); box-shadow: 0 0 18px color-mix(in srgb, var(--b-crit) 55%, transparent); } .re-b-crit .re-b-etat, .re-b-crit .re-b-valeur { color: var(--b-crit); }
+.re-b-fumble { border-color: var(--b-fumble); box-shadow: 0 0 18px rgba(255,40,40,.45); } .re-b-fumble .re-b-etat, .re-b-fumble .re-b-valeur { color: var(--b-fumble); }
+.re-b-gagnant { transform: translateY(-4px); } .re-b-gagnant .re-b-couronne { transform: translateX(-50%) scale(1); }
+
+.re-b-verdict { margin-top: 10px; text-align: center; font: 22px var(--b-title); color: var(--b-accent); opacity: 0; transform: translateY(6px); transition: opacity .4s, transform .4s; min-height: 0; }
+.re-b-verdict:empty { display: none; }
+.re-b-verdict.re-b-visible { opacity: 1; transform: none; }
+
+.re-des { display: inline-flex; gap: 1px; font-size: 11px; }
+.re-de-bonus { color: var(--b-ok); }
+.re-de-malus { color: var(--b-ko); }
+
+/* ---------- Carte de chat ---------- */
+.re-carte {
+  background: var(--b-bg); color: var(--b-ink); border: 1px solid var(--b-border); border-radius: 4px;
+  padding: 8px 8px 6px; font-family: var(--b-label);
+}
+body.c7cc-on .re-carte { background: transparent; border: none; padding: 2px 0 0; }
+.re-carte-tete { display: flex; align-items: center; gap: 8px; padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--b-border2); }
+.re-carte-de { font-size: 22px; color: var(--b-accent); }
+.re-carte-titres { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.re-carte-titres h3 { margin: 0; border: none; font: 400 18px/1.15 var(--b-title); color: var(--b-accent); }
+.re-carte-sous { font-size: 12px; color: var(--b-dim); }
+.re-carte-compte { font: 26px/1 var(--b-title); color: var(--b-ink); }
+.re-carte-compte small { font-size: 14px; color: var(--b-dim); }
+.re-carte-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.re-carte-ligne {
+  display: grid; grid-template-columns: 38px 1fr auto auto; align-items: center; gap: 7px;
+  padding: 3px 6px 3px 3px; border-radius: 4px; background: rgba(0,0,0,.18); border-left: 3px solid transparent;
+}
+.re-carte-portrait { position: relative; width: 38px; height: 38px; }
+.re-carte-portrait img { width: 38px; height: 38px; object-fit: cover; object-position: center 20%; border-radius: 50%; border: 1px solid var(--b-border); }
+.re-carte-portrait .fa-crown { position: absolute; top: -7px; right: -4px; font-size: 13px; color: var(--b-crit); filter: drop-shadow(0 1px 1px #000); }
+.re-carte-qui { min-width: 0; display: flex; flex-direction: column; line-height: 1.15; }
+.re-carte-nom { font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.re-carte-equipe { font-size: 10px; padding: 0 4px; border: 1px solid var(--b-border2); border-radius: 3px; color: var(--b-dim); }
+.re-carte-score { font-size: 11px; color: var(--b-dim); display: flex; gap: 4px; align-items: center; }
+.re-carte-jet { font: 22px/1 var(--b-title); min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; }
+.re-carte-etat { display: flex; flex-direction: column; align-items: center; width: 62px; font-size: 9.5px; line-height: 1.1; text-align: center; }
+.re-carte-etat i { font-size: 19px; margin-bottom: 1px; }
+.re-carte-ligne.re-ok { border-left-color: var(--b-ok); } .re-ok .re-carte-etat { color: var(--b-ok); }
+.re-carte-ligne.re-ko { border-left-color: var(--b-ko); } .re-ko .re-carte-etat { color: var(--b-ko); } .re-carte-ligne.re-ko .re-carte-portrait img { filter: grayscale(.6); }
+.re-carte-ligne.re-crit { border-left-color: var(--b-crit); background: color-mix(in srgb, var(--b-crit) 12%, transparent); } .re-crit .re-carte-etat, .re-crit .re-carte-jet { color: var(--b-crit); }
+.re-carte-ligne.re-fumble { border-left-color: var(--b-fumble); background: rgba(255,30,30,.12); } .re-fumble .re-carte-etat, .re-fumble .re-carte-jet { color: var(--b-fumble); }
+.re-carte-verdict { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--b-border2); text-align: center; font: 16px var(--b-title); color: var(--b-accent); }
+.re-carte-verdict.re-ok { color: var(--b-ok); }
+.re-carte-verdict.re-ko { color: var(--b-ko); }
