@@ -41,7 +41,7 @@ https://github.com/magisterphamtom/roll-ensemble-coc7/releases/latest/download/m
 
 ## Utilisation (Gardien)
 
-1. Dans le chat, cliquer sur le bouton **Lancer Groupé CoC7** (au-dessus de la zone de saisie, visible uniquement du Gardien).
+1. Ouvrir la préparation : bouton **dés** dans la barre de gauche (outils des jetons, visible du Gardien seul), macro **Lancer de groupe** (créée au premier lancement dans le dossier « Outils CoC7 », avec son icône), ou bouton **Lancer Groupé CoC7** au-dessus du chat.
 2. Donner un nom au lancer (ex. « Fuite dans les catacombes »).
 3. Choisir les participants : cliquer leur vignette, cliquer directement leur jeton sur la scène, glisser des acteurs, ou ajouter les jetons sélectionnés. Des filtres montrent les joueurs seuls ou les PNJ.
 4. Choisir la compétence ou la caractéristique dans la liste (elle s'appuie sur les fiches des participants sélectionnés).

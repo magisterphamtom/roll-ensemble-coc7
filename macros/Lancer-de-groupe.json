@@ -1,0 +1,13 @@
+{
+  "name": "Lancer de groupe",
+  "type": "script",
+  "img": "modules/roll-ensemble-coc7/icons/macros/lancer-groupe.svg",
+  "scope": "global",
+  "command": "const mod = game.modules.get(\"roll-ensemble-coc7\");\nif (!mod?.active) return ui.notifications.warn(\"Le module « Roll Ensemble — CoC7 » n'est pas activé.\");\nmod.api.ouvrir();",
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {}
+}

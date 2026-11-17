@@ -223,6 +223,8 @@
       "Aide": "Save this roll as a macro (Shift+click to edit)",
       "Cree": "Macro “{nom}” created in your hotbar",
       "MJ": "Only the Keeper can start a group roll."
-    }
+    },
+    "Bouton": "Group roll",
+    "MacroCreee": "“Group roll” macro created in the “Outils CoC7” folder."
   }
 }

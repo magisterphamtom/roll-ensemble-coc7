@@ -223,6 +223,8 @@
       "Aide": "Enregistrer ce lancer en macro : un clic le relance (Maj + clic pour le modifier)",
       "Cree": "Macro « {nom} » créée dans ta barre de macros",
       "MJ": "Seul le Gardien peut lancer un lancer de groupe."
-    }
+    },
+    "Bouton": "Lancer de groupe",
+    "MacroCreee": "Macro « Lancer de groupe » créée dans le dossier « Outils CoC7 » : glisse-la dans ta barre de macros."
   }
 }
