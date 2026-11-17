@@ -90,6 +90,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 /* Macro « Lancer de groupe » avec son icône, créée une seule fois pour le Gardien (dossier « Outils CoC7 ») */
 Hooks.once("ready", async () => {
   if (!game.user.isGM || game.users.activeGM?.id !== game.user.id) return;
+  await macroStreamDeck();
   if (game.settings.get("roll-ensemble-coc7", "macroCreee")) return;
   try {
     const nomDossier = "Outils CoC7";
@@ -108,3 +109,29 @@ Hooks.once("ready", async () => {
     console.warn("roll-ensemble-coc7 | macro", e);
   }
 });
+
+/**
+ * Avec le module Commandes Stream Deck : macro « SD 45 · Lancer de groupe » (touche Alt+F21),
+ * créée une fois dans le dossier « Stream Deck » si l'emplacement 45 est libre.
+ */
+async function macroStreamDeck() {
+  if (!game.modules.get("commandes-stream-deck")?.active) return;
+  if (game.settings.get("roll-ensemble-coc7", "macroSD")) return;
+  try {
+    if (game.macros.some((m) => m.name === "SD 45" || m.name.startsWith("SD 45 "))) {
+      await game.settings.set("roll-ensemble-coc7", "macroSD", true);
+      return;
+    }
+    let dossier = game.folders.find((f) => f.type === "Macro" && f.name === "Stream Deck");
+    dossier ??= await Folder.create({ name: "Stream Deck", type: "Macro" });
+    await Macro.create({
+      name: "SD 45 · Lancer de groupe", type: "script", folder: dossier.id,
+      img: "modules/roll-ensemble-coc7/icons/macros/lancer-groupe.svg",
+      command: 'game.modules.get("roll-ensemble-coc7")?.api?.ouvrir();'
+    });
+    await game.settings.set("roll-ensemble-coc7", "macroSD", true);
+    ui.notifications.info(game.i18n.localize("ROLLENSEMBLECOC7.MacroSD"));
+  } catch (e) {
+    console.warn("roll-ensemble-coc7 | macro Stream Deck", e);
+  }
+}

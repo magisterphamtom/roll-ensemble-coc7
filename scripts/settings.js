@@ -1,6 +1,7 @@
 export const MODULE_ID = "roll-ensemble-coc7";
 
 export function registerSettings() {
+  game.settings.register(MODULE_ID, "macroSD", { scope: "world", config: false, type: Boolean, default: false });
   game.settings.register(MODULE_ID, "macroCreee", { scope: "world", config: false, type: Boolean, default: false });
 
   game.settings.register(MODULE_ID, "rattrapage", {

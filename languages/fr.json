@@ -225,6 +225,7 @@
       "MJ": "Seul le Gardien peut lancer un lancer de groupe."
     },
     "Bouton": "Lancer de groupe",
-    "MacroCreee": "Macro « Lancer de groupe » créée dans le dossier « Outils CoC7 » : glisse-la dans ta barre de macros."
+    "MacroCreee": "Macro « Lancer de groupe » créée dans le dossier « Outils CoC7 » : glisse-la dans ta barre de macros.",
+    "MacroSD": "Stream Deck : macro « SD 45 · Lancer de groupe » créée (touche Alt+F21)."
   }
 }
