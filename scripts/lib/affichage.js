@@ -19,3 +19,11 @@ export function finaliserAffichage(payload) {
   Banniere.finaliser(payload);
   SpectatorApp.finalizeAny(payload);
 }
+
+export function appliquerAjustement(data) {
+  Banniere.ajuster(data);
+}
+
+export function ouvrirRattrapage(id) {
+  Banniere.rattrapage(id);
+}

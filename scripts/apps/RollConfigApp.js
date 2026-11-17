@@ -7,8 +7,8 @@ import {
   getActorSkills, getSkillValueByLabel, CHARACTERISTICS, getCharacteristicValue,
   SPECIAL_ATTRIBUTES, getSpecialAttributeValue, getActiveOwners
 } from "../lib/actor-skills.js";
-import { registerPendingRoll } from "../lib/roll-manager.js";
-import { postChatRecap } from "../lib/chat-recap.js";
+import { creerMacroFavori } from "../lib/favoris.js";
+import { registerRoll, apresJets } from "../lib/roll-manager.js";
 import { ouvrirAffichage, enBanniere } from "../lib/affichage.js";
 import { themeActif } from "../lib/themes.js";
 
@@ -39,11 +39,16 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       setGlobalDice: function (e, t) { this.#sync(); this.globalDice = Number(t.dataset.value); for (const p of this.participants) p.dice = this.globalDice; this.render(); },
       setDice: function (e, t) { this.#sync(); const p = this.participants.find(x => x.key === t.dataset.key); if (p) p.dice = Number(t.dataset.value); this.render(); },
       setTeam: function (e, t) { this.#sync(); const p = this.participants.find(x => x.key === t.dataset.key); if (p) p.team = p.team === "A" ? "B" : "A"; this.render(); },
-      toggleTeams: function () { this.#sync(); this.teams = !this.teams; this.render(); },
+      toggleTeams: function () { this.#sync(); this.teams = !this.teams; if (this.teams) this.adversaire.on = false; this.render(); },
       toggleCache: function () { this.#sync(); this.cache = !this.cache; this.render(); },
       toggleNpc: function () { this.#sync(); this.npcOpen = !this.npcOpen; this.render(); },
       addAllPlayers: RollConfigApp.#onAddAllPlayers,
-      clearAll: function () { this.participants = []; this.render(); }
+      saveMacro: RollConfigApp.#onSaveMacro,
+      setRegle: function (e, t) { this.#sync(); this.regle = t.dataset.value; this.render(); },
+      toggleAdversaire: function () { this.#sync(); this.adversaire.on = !this.adversaire.on; if (this.adversaire.on) this.teams = false; this.render(); },
+      setAdvDice: function (e, t) { this.#sync(); this.adversaire.dice = Number(t.dataset.value); this.render(); },
+      toggleAdvCache: function () { this.#sync(); this.adversaire.cache = !this.adversaire.cache; this.render(); },
+      clearAll: function () { this.participants = []; this.tousJoueurs = false; this.render(); }
     }
   };
 
@@ -59,6 +64,11 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   globalDice = 0; // dés bonus/malus appliqués à tous
   npcOpen = false;
   cache = false; // résultats cachés aux joueurs
+  regle = "chacun"; // chacun | un | tous | majorite
+  perteSan = { ok: "0", ko: "1D6" };
+  tousJoueurs = false;
+  /** Jet d'opposition contre un adversaire lancé par le Gardien */
+  adversaire = { on: false, actorUuid: null, skill: null, dice: 0, cache: false };
   search = "";
   /** @type {{kind: "skill"|"char"|"special", label: string, key?: string}|null} */
   selectedSkill = null;
@@ -117,8 +127,28 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       };
     });
 
+    // --- Adversaire : jetons de la scène (hors participants) et ses compétences
+    const advActeurs = placeables.filter(t => !choisi(t.actor.uuid)).map(t => ({ uuid: t.actor.uuid, name: t.name || t.actor.name, selected: t.actor.uuid === this.adversaire.actorUuid }));
+    if (this.adversaire.actorUuid && !advActeurs.some(a => a.selected)) {
+      const a0 = await fromUuid(this.adversaire.actorUuid);
+      if (a0) advActeurs.unshift({ uuid: a0.uuid, name: a0.name, selected: true });
+    }
+    const advActor = this.adversaire.actorUuid ? await fromUuid(this.adversaire.actorUuid) : null;
+    const sk = this.adversaire.skill;
+    const val = (kind, v) => `${kind}|${v}`;
+    const advSkills = advActor ? [
+      ...getActorSkills(advActor).map(x => ({ v: val("skill", x.label), label: `${x.label} (${x.value} %)`, selected: sk?.kind === "skill" && sk.label === x.label })),
+      ...SPECIAL_ATTRIBUTES.map(c => ({ v: val("special", c.key), label: c.label, selected: sk?.kind === "special" && sk.key === c.key })),
+      ...CHARACTERISTICS.map(c => ({ v: val("char", c.key), label: `${c.label} (×5)`, selected: sk?.kind === "char" && sk.key === c.key }))
+    ] : [];
+
     return {
       theme: themeActif(),
+      regles: ["chacun", "un", "tous", "majorite"].map(v => ({ v, actif: this.regle === v, label: L(`Regle.Nom.${v}`) })),
+      adversaire: { ...this.adversaire, acteurs: advActeurs, skills: advSkills, actorName: advActor?.name,
+        crans: [-2, -1, 0, 1, 2].map(v => ({ v, actif: this.adversaire.dice === v, cls: v < 0 ? "malus" : v > 0 ? "bonus" : "normal", n: Math.abs(v) })) },
+      estSan: this.selectedSkill?.kind === "special" && this.selectedSkill.key === "san",
+      perteSan: this.perteSan,
       label: this.label,
       teams: this.teams,
       cache: this.cache,
@@ -151,6 +181,17 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     for (const p of this.participants) {
       const m = el.querySelector(`[name="modifier-${p.key}"]`);
       if (m) p.modifier = Number(m.value) || 0;
+    }
+    const ok = el.querySelector('[name="perteOk"]'), ko = el.querySelector('[name="perteKo"]');
+    if (ok) this.perteSan.ok = ok.value.trim() || "0";
+    if (ko) this.perteSan.ko = ko.value.trim() || "0";
+    const advA = el.querySelector('[name="advActor"]');
+    if (advA && advA.value !== (this.adversaire.actorUuid ?? "")) { this.adversaire.actorUuid = advA.value || null; this.adversaire.skill = null; }
+    const advS = el.querySelector('[name="advSkill"]');
+    if (advS && advS.value) {
+      const [kind, ...rest] = advS.value.split("|");
+      const v = rest.join("|");
+      this.adversaire.skill = kind === "skill" ? { kind, label: v } : { kind, key: v };
     }
   }
 
@@ -200,6 +241,9 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const theme = context.theme ?? "classique";
     this.element.classList.remove(...[...this.element.classList].filter(c => c.startsWith("re-t-")));
     this.element.classList.add("re-cfg", `re-t-${theme}`);
+
+    // Choix de l'adversaire : recharge la liste de ses compétences
+    this.element.querySelector('[name="advActor"]')?.addEventListener("change", () => { this.#sync(); this.render(); });
 
     // Recherche en direct (compétences et PNJ), sans redessiner
     const filtre = (input, selecteur) => {
@@ -279,6 +323,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onAddAllPlayers() {
     this.#sync();
+    this.tousJoueurs = true;
     const ctx = await this._prepareContext();
     for (const j of ctx.players) {
       if (this.participants.some(p => p.actorUuid === j.actorUuid)) continue;
@@ -330,12 +375,18 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   #buildBasePayload(rollId, skillDisplayLabel) {
+    const sk = this.selectedSkill ?? {};
     return {
       id: rollId,
       label: this.label || skillDisplayLabel || game.i18n.localize("ROLLENSEMBLECOC7.ChatButton"),
       teams: this.teams,
-      difficulty: this.difficulty,
+      difficulty: this.adversaire.on ? "none" : this.difficulty,
       cache: this.cache,
+      regle: this.teams ? "chacun" : this.regle,
+      skillKind: sk.kind, skillKey: sk.key, skillLabel: sk.label ?? null,
+      rattrapage: game.settings.get(MODULE_ID, "rattrapage") && enBanniere(),
+      experience: game.settings.get(MODULE_ID, "experience"),
+      perteSan: sk.kind === "special" && sk.key === "san" ? { ...this.perteSan } : null,
       theme: themeActif(),
       rollDurationMs: game.settings.get(MODULE_ID, "rollDurationMs"),
       staggerMs: game.settings.get(MODULE_ID, "staggerMs"),
@@ -345,6 +396,90 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       soundComplete: game.settings.get(MODULE_ID, "soundComplete"),
       soundFumble: game.settings.get(MODULE_ID, "soundFumble")
     };
+  }
+
+  /** Le Gardien lance pour un participant (ou un adversaire) : résultat complet + le jet pour Dice So Nice. */
+  async #jetGardien(effectiveSkill, dice, requiredRank) {
+    const { roll, jet } = await lancerPourcentage(dice > 0 ? dice : 0, dice < 0 ? -dice : 0);
+    const level = successLevel(roll, effectiveSkill);
+    const rank = RANK[level];
+    return { jet, res: { roll, level, rank, rangJet: rank, meetsThreshold: requiredRank === null ? null : rank >= requiredRank } };
+  }
+
+  /** L'adversaire du groupe (jet d'opposition), lancé par le Gardien. */
+  async #lancerAdversaire() {
+    const a = this.adversaire;
+    if (!a.on || !a.actorUuid || !a.skill) return { adversaire: null, jet: null };
+    const actor = await fromUuid(a.actorUuid);
+    if (!actor) return { adversaire: null, jet: null };
+    const base = this.#scoreSkill(actor, a.skill) ?? 0;
+    const effectiveSkill = Math.max(0, Math.min(100, base));
+    const { jet, res } = await this.#jetGardien(effectiveSkill, a.dice, null);
+    return {
+      jet,
+      adversaire: { name: actor.name, img: actor.img, actorUuid: actor.uuid, skillLabel: this.#libelleSkill(a.skill), effectiveSkill, dice: a.dice, cache: a.cache, ...res }
+    };
+  }
+
+  #scoreSkill(actor, sk) {
+    if (!actor || !sk) return null;
+    if (sk.kind === "char") return getCharacteristicValue(actor, sk.key) * 5;
+    if (sk.kind === "special") return getSpecialAttributeValue(actor, sk.key);
+    return getSkillValueByLabel(actor, sk.label);
+  }
+
+  #libelleSkill(sk) {
+    if (!sk) return "";
+    if (sk.kind === "char") return `${CHARACTERISTICS.find(c => c.key === sk.key)?.label ?? sk.key} (×5)`;
+    if (sk.kind === "special") return SPECIAL_ATTRIBUTES.find(c => c.key === sk.key)?.label ?? sk.key;
+    return sk.label;
+  }
+
+  /** Lancer prêt à partir sans ouvrir la fenêtre (macro favorite) : demande aux joueurs, sinon le Gardien lance. */
+  async executer(mode = "auto") {
+    if (mode === "launch") return RollConfigApp.#onLaunch.call(this);
+    if (mode === "request") return RollConfigApp.#onSendRequest.call(this);
+    const joueurs = [];
+    for (const p of this.participants) {
+      const a = p.actorUuid ? await fromUuid(p.actorUuid) : null;
+      if (!p.forceGM && a && getActiveOwners(a).length) joueurs.push(p);
+    }
+    return joueurs.length ? RollConfigApp.#onSendRequest.call(this) : RollConfigApp.#onLaunch.call(this);
+  }
+
+  /** État de la fenêtre sous forme simple, pour une macro favorite. */
+  versFavori() {
+    this.#sync();
+    return {
+      label: this.label, skill: this.selectedSkill, difficulty: this.difficulty, globalDice: this.globalDice,
+      teams: this.teams, cache: this.cache, regle: this.regle, perteSan: this.perteSan,
+      adversaire: this.adversaire.on ? { ...this.adversaire } : null,
+      tousJoueurs: this.tousJoueurs,
+      participants: this.participants.map(p => ({ actorUuid: p.actorUuid, modifier: p.modifier, dice: p.dice, team: p.team, forceGM: p.forceGM }))
+    };
+  }
+
+  /** Remplit la fenêtre depuis une macro favorite. */
+  async depuisFavori(f) {
+    Object.assign(this, {
+      label: f.label ?? "", selectedSkill: f.skill ?? null, difficulty: f.difficulty ?? "none", globalDice: f.globalDice ?? 0,
+      teams: !!f.teams, cache: !!f.cache, regle: f.regle ?? "chacun", perteSan: f.perteSan ?? this.perteSan,
+      tousJoueurs: !!f.tousJoueurs
+    });
+    if (f.adversaire) this.adversaire = { ...this.adversaire, ...f.adversaire, on: true };
+    this.participants = [];
+    const liste = [...(f.participants ?? [])];
+    if (f.tousJoueurs) {
+      for (const u of game.users.filter(u => !u.isGM && u.character)) {
+        if (!liste.some(x => x.actorUuid === u.character.uuid)) liste.push({ actorUuid: u.character.uuid, dice: f.globalDice ?? 0 });
+      }
+    }
+    for (const x of liste) {
+      const a = await fromUuid(x.actorUuid);
+      if (!a) continue;
+      this.#addActor(a);
+      Object.assign(this.participants.at(-1), { modifier: x.modifier ?? 0, dice: x.dice ?? this.globalDice, team: x.team ?? "A", forceGM: !!x.forceGM });
+    }
   }
 
   async #checkReady() {
@@ -367,7 +502,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.#sync();
     if (!(await this.#checkReady())) return;
 
-    const requiredRank = this.difficulty !== "none" ? RANK[this.difficulty] : null;
+    const requiredRank = this.adversaire.on ? null : (this.difficulty !== "none" ? RANK[this.difficulty] : null);
     const skillDisplayLabel = this.#skillDisplayLabel();
     const rollId = makeRollId();
 
@@ -376,39 +511,36 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     for (const p of this.participants) {
       const actor = p.actorUuid ? await fromUuid(p.actorUuid) : null;
       const { noSkill, effectiveSkill } = await this.#resolveEffectiveSkill(p, actor);
-
-      const bonusDice = p.dice > 0 ? p.dice : 0;
-      const penaltyDice = p.dice < 0 ? -p.dice : 0;
-      const { roll, jet } = await lancerPourcentage(bonusDice, penaltyDice);
+      const { jet, res } = await this.#jetGardien(effectiveSkill, p.dice, requiredRank);
       jets.push(jet);
-      const level = successLevel(roll, effectiveSkill);
-      const rank = RANK[level];
-      participants.push({
-        ...p, skillLabel: skillDisplayLabel, effectiveSkill, noSkill,
-        pending: false, roll, level, rank,
-        meetsThreshold: requiredRank === null ? null : rank >= requiredRank
-      });
+      participants.push({ ...p, skillLabel: skillDisplayLabel, effectiveSkill, noSkill, pending: false, ...res });
     }
+    const { adversaire, jet: jetAdv } = await this.#lancerAdversaire();
 
-    const payload = {
-      ...this.#buildBasePayload(rollId, skillDisplayLabel),
-      participants,
-      winners: determineWinners(participants, this.teams)
-    };
+    const payload = { ...this.#buildBasePayload(rollId, skillDisplayLabel), participants, adversaire, winners: null };
 
     // Dice So Nice : la bannière fait défiler les chiffres pendant que les dés roulent, puis révèle
     payload.attente3d = dsnActif() && enBanniere();
+    registerRoll(payload, []);
     broadcast("start", payload);
     ouvrirAffichage(payload);
-    this.close();
+    if (this.rendered) this.close();
+    const n = participants.length + (adversaire ? 1 : 0);
     if (payload.attente3d) {
-      await montrerDes(jets, payload.cache);
+      await this.#montrerTout(jets, jetAdv, payload);
       diffuser("reveal", { id: rollId });
       Banniere.revelerTout(rollId);
-    } else montrerDes(jets, payload.cache);
-    // La carte du chat arrive quand l'animation a révélé tout le monde
-    const attente = payload.rollDurationMs + Math.max(0, participants.length - 1) * payload.staggerMs + 400;
-    setTimeout(() => postChatRecap(payload), attente);
+      setTimeout(() => apresJets(rollId), 200 + n * payload.staggerMs + 500);
+    } else {
+      this.#montrerTout(jets, jetAdv, payload);
+      setTimeout(() => apresJets(rollId), payload.rollDurationMs + n * payload.staggerMs + 500);
+    }
+  }
+
+  #montrerTout(jets, jetAdv, payload) {
+    const p = [montrerDes(jets, payload.cache)];
+    if (jetAdv) p.push(montrerDes([jetAdv], payload.cache || payload.adversaire?.cache));
+    return Promise.all(p);
   }
 
   /**
@@ -421,18 +553,25 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.#sync();
     if (!(await this.#checkReady())) return;
 
-    const requiredRank = this.difficulty !== "none" ? RANK[this.difficulty] : null;
+    const requiredRank = this.adversaire.on ? null : (this.difficulty !== "none" ? RANK[this.difficulty] : null);
     const skillDisplayLabel = this.#skillDisplayLabel();
     const rollId = makeRollId();
 
     const participants = [];
     const requests = [];
 
+    const jetsGardien = [];
     for (const p of this.participants) {
-      if (p.forceGM) continue;
       const actor = p.actorUuid ? await fromUuid(p.actorUuid) : null;
       const owners = actor ? getActiveOwners(actor) : [];
-      if (!owners.length) continue;
+      if (p.forceGM || !owners.length) {
+        // Sans joueur connecté (PNJ, joueur absent) : le Gardien lance tout de suite
+        const { noSkill, effectiveSkill } = await this.#resolveEffectiveSkill(p, actor);
+        const { jet, res } = await this.#jetGardien(effectiveSkill, p.dice, requiredRank);
+        jetsGardien.push(jet);
+        participants.push({ ...p, skillLabel: skillDisplayLabel, effectiveSkill, noSkill, pending: false, ...res });
+        continue;
+      }
 
       const { noSkill, effectiveSkill } = await this.#resolveEffectiveSkill(p, actor);
       participants.push({
@@ -455,24 +594,32 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
 
-    if (!participants.length) {
+    if (!requests.length) {
       ui.notifications.warn(game.i18n.localize("ROLLENSEMBLECOC7.Config.NoEligiblePlayers"));
       return;
     }
 
+    const { adversaire, jet: jetAdv } = await this.#lancerAdversaire();
     const payload = {
       ...this.#buildBasePayload(rollId, skillDisplayLabel),
       participants,
+      adversaire,
       winners: null
     };
 
+    registerRoll(payload, requests.map(r => r.key));
     broadcast("start", payload);
     ouvrirAffichage(payload);
-
-    registerPendingRoll(payload, requests.map(r => r.key));
+    this.#montrerTout(jetsGardien, jetAdv, payload);
     for (const req of requests) broadcast("roll-request", req);
     ui.notifications.info(game.i18n.format("ROLLENSEMBLECOC7.Config.RequestsSent", { count: requests.length }));
 
-    this.close();
+    if (this.rendered) this.close();
+  }
+
+  static async #onSaveMacro() {
+    this.#sync();
+    if (!(await this.#checkReady())) return;
+    await creerMacroFavori(this.versFavori(), this.label || this.#skillDisplayLabel());
   }
 }

@@ -128,7 +128,11 @@
       "EffetsCritiques": "Critical and fumble effects",
       "EffetsCritiquesHint": "Shows Critiques du Mythe full-screen cards (if active) on criticals and fumbles.",
       "Theme": "Banner and chat card theme",
-      "ThemeHint": "Automatic: follows the era set with Bascule d'époque, otherwise the chat card theme."
+      "ThemeHint": "Automatic: follows the era set with Bascule d'époque, otherwise the chat card theme.",
+      "Rattrapage": "Push rolls and spend Luck",
+      "RattrapageHint": "After rolling, failed investigators may push or spend Luck from the banner.",
+      "Experience": "Check experience",
+      "ExperienceHint": "A rolled success checks the skill's experience box."
     },
     "Banniere": {
       "Kicker": "Group roll",
@@ -157,6 +161,68 @@
       "montagnes": "Beyond the Mountains of Madness",
       "ny2026": "New York 2026",
       "antarctique2026": "Antarctica 2026"
+    },
+    "Regle": {
+      "Titre": "Group rule",
+      "Nom": {
+        "chacun": "Each on their own",
+        "un": "One is enough",
+        "tous": "Everyone must succeed",
+        "majorite": "Majority"
+      },
+      "Ok": {
+        "un": "The group succeeds! ({ok} of {total})",
+        "tous": "The whole group succeeds!",
+        "majorite": "The majority succeeds! ({ok} of {total})"
+      },
+      "Ko": {
+        "un": "Nobody succeeds… the group fails",
+        "tous": "The group fails ({ok} of {total})",
+        "majorite": "Not enough successes ({ok} of {total})"
+      }
+    },
+    "Rattrapage": {
+      "Titre": "Push the roll or spend Luck?",
+      "Reflechit": "Thinking…",
+      "Pousser": "Push",
+      "PousserAide": "Reroll once (a failed pushed roll has consequences)",
+      "Chance": "Luck −{n}",
+      "ChanceAide": "Spend Luck to just succeed",
+      "AccepterAide": "Keep this result",
+      "Valider": "Confirm",
+      "ValiderAide": "Close the roll now",
+      "Pousse": "Pushed",
+      "PousseRate": "Failed push!",
+      "ChanceDepensee": "Luck −{n}"
+    },
+    "Adversaire": {
+      "Titre": "Against an opponent (opposed roll)",
+      "Choisir": "Choose the opponent…",
+      "Competence": "Their skill…",
+      "CacheOpt": "Hide their roll",
+      "Aide": "The Keeper rolls for the opponent; each investigator is compared to them.",
+      "Cache": "Hidden",
+      "gagne": "Beats {nom}",
+      "perd": "Beaten by {nom}",
+      "egal": "Tie with {nom}",
+      "Contre": "Against"
+    },
+    "San": {
+      "Titre": "Sanity loss",
+      "SiReussi": "Success",
+      "SiRate": "Failure",
+      "Aide": "E.g. 0/1D4, 1/1D6. A fumble loses the maximum. Loss is applied to sheets.",
+      "Perte": "−{n} SAN",
+      "PerteGrosse": "−{n} SAN · INT roll"
+    },
+    "Xp": {
+      "Coche": "Experience checked"
+    },
+    "Favori": {
+      "Bouton": "Favourite",
+      "Aide": "Save this roll as a macro (Shift+click to edit)",
+      "Cree": "Macro “{nom}” created in your hotbar",
+      "MJ": "Only the Keeper can start a group roll."
     }
   }
 }

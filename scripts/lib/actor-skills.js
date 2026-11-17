@@ -91,3 +91,17 @@ export function getActiveOwners(actor) {
   if (!actor) return [];
   return game.users.filter(u => !u.isGM && u.active && actor.testUserPermission(u, "OWNER"));
 }
+
+/** L'objet compétence d'un acteur par son libellé complet (nom + spécialisation). */
+export function getSkillItemByLabel(actor, label) {
+  if (!actor || !label) return null;
+  const s = getActorSkills(actor).find(x => x.label === label);
+  return s ? actor.items.get(s.id) : null;
+}
+
+/** Chance actuelle (null si la fiche n'en a pas). */
+export function getLuckValue(actor) {
+  const n = actor?.system?.attribs?.luck;
+  if (n && typeof n === "object" && "value" in n) return Number(n.value) || 0;
+  return null;
+}

@@ -1,6 +1,6 @@
 import { MODULE_ID, registerSettings } from "./settings.js";
 import { initSocket } from "./lib/socket.js";
-import { handleRollResponse } from "./lib/roll-manager.js";
+import { handleRollResponse, handleAjustement } from "./lib/roll-manager.js";
 import { RollConfigApp } from "./apps/RollConfigApp.js";
 import { Banniere } from "./apps/Banniere.js";
 import { ouvrirAffichage, appliquerResultat, finaliserAffichage, enBanniere } from "./lib/affichage.js";
@@ -25,6 +25,11 @@ Hooks.once("ready", () => {
       if (game.user.isGM) handleRollResponse(data);
     },
     reveal: (data) => Banniere.revelerTout(data.id),
+    rattrapage: (data) => Banniere.rattrapage(data.id),
+    ajustement: (data) => {
+      Banniere.ajuster(data);
+      if (game.user.isGM) handleAjustement(data);
+    },
     "results-final": (payload) => {
       finaliserAffichage(payload);
     }
@@ -50,4 +55,19 @@ Hooks.on("renderChatLog", (app, html) => {
   button.addEventListener("click", () => new RollConfigApp().render(true));
 
   target.insertAdjacentElement("beforebegin", button);
+});
+
+/* API : ouvrir la préparation, lancer un favori (macros) */
+Hooks.once("ready", () => {
+  const mod = game.modules.get("roll-ensemble-coc7");
+  mod.api = {
+    ouvrir: () => new RollConfigApp().render(true),
+    async lancerFavori(favori, { ouvrir = false } = {}) {
+      if (!game.user.isGM) return ui.notifications.warn(game.i18n.localize("ROLLENSEMBLECOC7.Favori.MJ"));
+      const app = new RollConfigApp();
+      await app.depuisFavori(favori);
+      if (ouvrir) return app.render(true);
+      return app.executer("auto");
+    }
+  };
 });

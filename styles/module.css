@@ -1039,3 +1039,77 @@
 .re-b-cache { border-color: var(--b-border); }
 .re-b-cache .re-b-valeur { color: var(--b-dim); font-size: 40px; }
 .re-b-cache .re-b-etat { color: var(--b-dim); }
+
+/* =====================================================================
+   1.2 — Rattrapage, adversaire, règles de groupe, SAN, favoris
+   et allègement pour le processeur
+   ===================================================================== */
+/* Moins de calculs graphiques : pas de flou d'arrière-plan sur la grande bannière,
+   pulsation par opacité (pas d'ombre animée), animations stoppées si le système le demande */
+.re-banniere .re-b-bande { backdrop-filter: none !important; }
+.re-b-lancer.re-b-moi { animation: none; position: relative; }
+.re-b-lancer.re-b-moi::after {
+  content: ""; position: absolute; inset: -5px; border-radius: 8px; pointer-events: none;
+  border: 2px solid var(--b-accent); opacity: 0; animation: re-b-halo 1.4s ease-out infinite;
+}
+@keyframes re-b-halo { 0% { opacity: .7; transform: scale(.96); } 100% { opacity: 0; transform: scale(1.08); } }
+.re-b-carte { contain: layout; }
+@media (prefers-reduced-motion: reduce) {
+  .re-b-de, .re-b-lancer.re-b-moi::after, .re-b-attente i { animation: none !important; }
+}
+
+/* Mentions sous un résultat */
+.re-b-mentions { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 0; }
+.re-m { display: inline-flex; align-items: center; gap: 4px; font: 600 12px var(--b-label); color: var(--b-dim); white-space: nowrap; }
+.re-banniere .re-m { font-size: 13px; }
+.re-m-pousse { color: var(--b-ok); } .re-m-pousse-rate { color: var(--b-fumble); }
+.re-m-chance { color: #3fae5a; } .re-m-gagne { color: var(--b-ok); } .re-m-perd { color: var(--b-ko); } .re-m-egal { color: var(--b-dim); }
+.re-m-san { color: #7a5cc4; } .re-m-xp { color: var(--b-crit); }
+
+/* Boutons de rattrapage */
+.re-b-actions { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+.re-b-actions:empty { display: none; }
+.re-b-actions button {
+  all: unset; box-sizing: border-box; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+  font: 600 13px var(--b-label); color: var(--b-ink); background: var(--b-card); border: 1px solid var(--b-border2);
+}
+.re-b-actions button:hover { border-color: var(--b-accent); color: var(--b-accent); }
+.re-b-actions button[data-act="chance"] { color: #3fae5a; border-color: #3fae5a; }
+.re-b-actions button:disabled { opacity: .45; cursor: default; }
+.re-b-reflechit { font-size: 12px; font-style: italic; color: var(--b-dim); }
+.re-b-valider {
+  all: unset; cursor: pointer; position: absolute; right: 2vw; bottom: 16px; padding: 6px 14px; border-radius: 4px;
+  font: 600 14px var(--b-label); color: var(--b-plain); background: var(--b-accent);
+}
+.re-b-valider:hover { filter: brightness(1.12); }
+.re-b-verdict.re-b-verdict-info { font-size: 22px; color: var(--b-dim); }
+.re-b-verdict.re-b-groupe-ok { color: var(--b-ok); }
+.re-b-verdict.re-b-groupe-ko { color: var(--b-ko); }
+
+/* Adversaire */
+.re-b-adversaire { border-style: dashed; border-color: var(--b-ko); }
+.re-b-adversaire .re-b-portrait img { filter: saturate(.8); border-color: var(--b-ko); }
+
+/* Carte de chat : adversaire et mentions */
+.re-carte-adv { display: flex; align-items: center; gap: 7px; padding: 4px 6px; margin-bottom: 4px; border-radius: 4px; background: var(--b-card); border: 1px dashed var(--b-ko); }
+.re-carte-adv img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.re-carte-adv-nom { flex: 1; font-size: 12px; }
+.re-carte-adv-niv { font-size: 10px; color: var(--b-dim); }
+.re-carte-mentions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 10px; padding-left: 45px; }
+.re-carte-mentions .re-m { font-size: 11px; }
+
+/* Fenêtre de préparation */
+.rc-macro { all: unset; cursor: pointer; padding: 6px 12px; border-radius: 16px; border: 1px solid var(--b-border2); background: var(--b-card); font-size: 13px; color: var(--b-ink); }
+.rc-macro:hover { border-color: var(--b-accent); color: var(--b-accent); }
+.rc-san { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.rc-san label { display: flex; align-items: center; gap: 6px; }
+.rc-san input { width: 64px; height: 26px; text-align: center; background: var(--b-plain); color: var(--b-ink); border: 1px solid var(--b-border2); border-radius: 4px; }
+.rc-aide { margin: 0; font-size: 11px; font-style: italic; color: var(--b-dim); }
+.rc-adv { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: var(--b-rayon); border: 1px dashed var(--b-ko); background: var(--b-card); }
+.rc-adv select { height: 28px; background: var(--b-plain); color: var(--b-ink); border: 1px solid var(--b-border2); border-radius: 4px; }
+.rc-adv select option { background: var(--b-plain); color: var(--b-ink); }
+.rc-adv-ligne { display: flex; align-items: center; gap: 8px; }
+.rc-petit-inter { all: unset; cursor: pointer; font-size: 12px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--b-border2); background: var(--b-plain); }
+.rc-petit-inter.rc-actif { background: var(--b-accent); color: var(--b-plain); border-color: var(--b-accent); }
+.rc-droite .rc-tuile { padding: 6px 2px; font-size: 12.5px; }
+.re-b-mentions .re-m { white-space: normal; text-align: center; justify-content: center; line-height: 1.15; }

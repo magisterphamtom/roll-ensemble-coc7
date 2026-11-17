@@ -13,6 +13,14 @@ Utile pour une fuite dans les catacombes, une recherche d'indices à plusieurs, 
 - **Bannière chez tout le monde** (nouveau en 1.1) : un bandeau s'affiche sur l'écran de chaque joueur avec le nom du jet, le d100 et les dés bonus/malus, et les portraits des personnages choisis. Chaque joueur clique sur **Lancer !** sous son portrait ; tout le monde voit les résultats apparaître en direct, puis le bilan du groupe. Le Gardien peut lancer à la place d'un joueur absent.
 - **Carte de chat récapitulative** (nouveau en 1.1) : tous les participants avec leur portrait, leur score, le jet, une coche verte (réussite), une croix rouge (échec), une étoile (01, réussite critique), une tête de mort (maladresse), une couronne pour le meilleur, et le bilan (« 3 réussites sur 5 », « Tout le groupe réussit ! », équipe gagnante).
 - **01 et maladresses** (nouveau en 1.1) : si le module **Critiques du Mythe** est actif, ses cartes plein écran s'affichent, aux couleurs de l'époque (plusieurs critiques passent l'un après l'autre).
+- **Pousser le jet ou dépenser de la Chance** (1.2) : après les jets, ceux qui ont échoué voient « Pousser », « Chance −N » et ✓ sous leur portrait. Un jet poussé raté est signalé ; la Chance est retirée de la fiche. Pas pour la Chance ni la SAN, ni sur un jet poussé. Le Gardien peut tout valider d'un clic.
+- **Expérience cochée** (1.2) : une réussite au dé coche la case d'expérience de la compétence, comme un jet normal de CoC7 (pas avec la Chance, ni en jet caché).
+- **Règle du groupe** (1.2) : chacun pour soi, un seul suffit, tous doivent réussir, ou la majorité ; la bannière donne le verdict du groupe en vert ou en rouge.
+- **Contre un adversaire** (1.2) : la Discrétion du groupe contre l'Écouter du garde, par exemple. Le Gardien lance pour l'adversaire (son jet peut rester caché) ; chaque investigateur l'emporte ou est battu (meilleur palier, puis plus haute compétence).
+- **Lancers favoris** (1.2) : le bouton « Favori » crée une macro dans ta barre ; un clic relance le même lancer (aux joueurs connectés, sinon le Gardien lance), Maj + clic ouvre la préparation remplie.
+- **Jet de SAN de groupe** (1.2) : choisis Santé mentale et indique la perte (ex. 1/1D6) ; elle est tirée et retirée des fiches (maladresse = perte maximale), avec un rappel du jet d'INT à partir de 5 points.
+- **PNJ et joueurs absents** (1.2) : avec « Envoyer aux joueurs », le Gardien lance tout de suite pour ceux qui n'ont pas de joueur connecté.
+- **Léger pour le processeur** (1.2) : une seule petite boucle d'animation pour tous les chiffres qui défilent, pas de flou d'arrière-plan, animations coupées si l'ordinateur demande moins de mouvements.
 - **Dice So Nice** : les dés roulent en 3D chez tout le monde (dés des dizaines du système CoC7 + dé des unités, avec les dés bonus et malus), puis le résultat s'affiche sur la bannière.
 - **Résultats cachés** (interrupteur dans la préparation) : les joueurs voient qui a lancé, pas le résultat ; seul le Gardien voit les chiffres, les dés 3D et la carte de chat.
 - **Six thèmes** : Classique, Années 20, New York années 20, Par-delà les Montagnes Hallucinées, New York 2026, Antarctique 2026. En « Automatique » (par défaut), le thème suit l'époque choisie avec **Bascule d'époque**, sinon le thème des **Cartes de chat thématiques**.
@@ -56,6 +64,8 @@ Dans les réglages du module (Gardien) :
 | Thème de la bannière et de la carte | automatique (suit l'époque) |
 | Affichage du lancer : bannière (portraits) ou fenêtre (ancienne présentation) | bannière |
 | Effets des 01 et maladresses (module Critiques du Mythe) | oui |
+| Pousser le jet et dépenser la Chance | oui |
+| Cocher l'expérience | oui |
 
 Une maladresse suit la règle de CoC7 : 100, ou 96 à 100 si la valeur visée est inférieure à 50. Si une maladresse survient pendant le lancer, le son d'échec critique remplace le son de victoire.
 

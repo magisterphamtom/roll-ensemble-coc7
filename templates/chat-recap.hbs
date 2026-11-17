@@ -4,9 +4,17 @@
     <div class="re-carte-titres">
       <h3>{{label}}</h3>
       {{#if sous}}<span class="re-carte-sous">{{sous}}</span>{{/if}}
+      {{#if regle}}<span class="re-carte-sous"><i class="fa-solid fa-people-group"></i> {{regle}}</span>{{/if}}
     </div>
     {{#unless teams}}<div class="re-carte-compte" title="{{localize 'ROLLENSEMBLECOC7.Bilan.Compte'}}">{{bilan.ok}}<small>/{{bilan.total}}</small></div>{{/unless}}
   </header>
+  {{#if adversaire}}
+    <div class="re-carte-adv">
+      <img src="{{adversaire.img}}" alt="">
+      <span class="re-carte-adv-nom"><b>{{localize "ROLLENSEMBLECOC7.Adversaire.Contre"}}</b> {{adversaire.name}} · {{adversaire.skillLabel}}</span>
+      {{#if adversaire.cache}}<span class="re-carte-jet">?</span>{{else}}<span class="re-carte-jet">{{adversaire.jet}}</span><span class="re-carte-adv-niv">{{adversaire.niveau}}</span>{{/if}}
+    </div>
+  {{/if}}
   <ol class="re-carte-liste">
     {{#each lignes}}
       <li class="re-carte-ligne re-{{this.etat}} {{#if this.gagnant}}re-gagnant{{/if}}">
@@ -17,6 +25,7 @@
         </div>
         <div class="re-carte-jet">{{this.jet}}</div>
         <div class="re-carte-etat" title="{{this.niveau}}"><i class="{{this.icone}}"></i><span>{{this.niveau}}</span></div>
+        {{#if this.mentions.length}}<div class="re-carte-mentions">{{#each this.mentions}}<span class="re-m {{this.cls}}"><i class="{{this.icone}}"></i> {{this.texte}}</span>{{/each}}</div>{{/if}}
       </li>
     {{/each}}
   </ol>

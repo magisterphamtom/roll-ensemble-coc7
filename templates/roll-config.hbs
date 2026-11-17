@@ -5,6 +5,7 @@
       <span class="rc-kicker">{{localize "ROLLENSEMBLECOC7.Banniere.Kicker"}}</span>
       <input type="text" name="label" value="{{label}}" placeholder="{{localize 'ROLLENSEMBLECOC7.Config.LabelPlaceholder'}}" />
     </div>
+    <button type="button" class="rc-macro" data-action="saveMacro" title="{{localize 'ROLLENSEMBLECOC7.Favori.Aide'}}"><i class="fa-solid fa-bookmark"></i> {{localize "ROLLENSEMBLECOC7.Favori.Bouton"}}</button>
   </header>
 
   <div class="rc-corps">
@@ -98,12 +99,33 @@
         {{#if selectedSkillLabel}}{{selectedSkillLabel}}{{else}}{{localize "ROLLENSEMBLECOC7.Config.NoSkillSelected"}}{{/if}}
       </div>
 
-      <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.Difficulty"}}</div>
-      <div class="rc-tuiles">
-        {{#each difficulties}}
-          <button type="button" class="rc-tuile {{#if this.actif}}rc-actif{{/if}}" data-action="setDifficulty" data-value="{{this.v}}">{{this.label}}</button>
-        {{/each}}
-      </div>
+      {{#if estSan}}
+        <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.San.Titre"}}</div>
+        <div class="rc-san">
+          <label>{{localize "ROLLENSEMBLECOC7.San.SiReussi"}} <input type="text" name="perteOk" value="{{perteSan.ok}}" placeholder="0" /></label>
+          <span>/</span>
+          <label>{{localize "ROLLENSEMBLECOC7.San.SiRate"}} <input type="text" name="perteKo" value="{{perteSan.ko}}" placeholder="1D6" /></label>
+        </div>
+        <p class="rc-aide">{{localize "ROLLENSEMBLECOC7.San.Aide"}}</p>
+      {{/if}}
+
+      {{#unless adversaire.on}}
+        <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.Difficulty"}}</div>
+        <div class="rc-tuiles">
+          {{#each difficulties}}
+            <button type="button" class="rc-tuile {{#if this.actif}}rc-actif{{/if}}" data-action="setDifficulty" data-value="{{this.v}}">{{this.label}}</button>
+          {{/each}}
+        </div>
+      {{/unless}}
+
+      {{#unless teams}}
+        <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Regle.Titre"}}</div>
+        <div class="rc-tuiles">
+          {{#each regles}}
+            <button type="button" class="rc-tuile {{#if this.actif}}rc-actif{{/if}}" data-action="setRegle" data-value="{{this.v}}">{{this.label}}</button>
+          {{/each}}
+        </div>
+      {{/unless}}
 
       <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.DesTous"}}</div>
       <div class="rc-crans">
@@ -117,6 +139,33 @@
       <button type="button" class="rc-interrupteur {{#if teams}}rc-actif{{/if}}" data-action="toggleTeams">
         <span class="rc-bascule"></span> {{localize "ROLLENSEMBLECOC7.Config.Teams"}}
       </button>
+
+      <button type="button" class="rc-interrupteur {{#if adversaire.on}}rc-actif{{/if}}" data-action="toggleAdversaire">
+        <span class="rc-bascule"></span> <i class="fa-solid fa-user-secret"></i> {{localize "ROLLENSEMBLECOC7.Adversaire.Titre"}}
+      </button>
+      {{#if adversaire.on}}
+        <div class="rc-adv">
+          <select name="advActor">
+            <option value="">{{localize "ROLLENSEMBLECOC7.Adversaire.Choisir"}}</option>
+            {{#each adversaire.acteurs}}<option value="{{this.uuid}}" {{#if this.selected}}selected{{/if}}>{{this.name}}</option>{{/each}}
+          </select>
+          {{#if adversaire.actorUuid}}
+            <select name="advSkill">
+              <option value="">{{localize "ROLLENSEMBLECOC7.Adversaire.Competence"}}</option>
+              {{#each adversaire.skills}}<option value="{{this.v}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>{{/each}}
+            </select>
+            <div class="rc-adv-ligne">
+              <div class="rc-mini-crans">
+                {{#each adversaire.crans}}
+                  <button type="button" class="rc-{{this.cls}} {{#if this.actif}}rc-actif{{/if}}" data-action="setAdvDice" data-value="{{this.v}}">{{#if this.n}}{{#if (eq this.cls "malus")}}−{{else}}+{{/if}}{{this.n}}{{else}}0{{/if}}</button>
+                {{/each}}
+              </div>
+              <button type="button" class="rc-petit-inter {{#if adversaire.cache}}rc-actif{{/if}}" data-action="toggleAdvCache"><i class="fa-solid fa-eye-slash"></i> {{localize "ROLLENSEMBLECOC7.Adversaire.CacheOpt"}}</button>
+            </div>
+          {{/if}}
+          <p class="rc-aide">{{localize "ROLLENSEMBLECOC7.Adversaire.Aide"}}</p>
+        </div>
+      {{/if}}
 
       <button type="button" class="rc-interrupteur {{#if cache}}rc-actif{{/if}}" data-action="toggleCache">
         <span class="rc-bascule"></span> <i class="fa-solid fa-eye-slash"></i> {{localize "ROLLENSEMBLECOC7.Config.Cache"}}

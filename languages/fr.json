@@ -128,7 +128,11 @@
       "EffetsCritiques": "Effets des 01 et maladresses",
       "EffetsCritiquesHint": "Affiche les cartes plein écran du module Critiques du Mythe (s'il est actif) sur une réussite critique ou une maladresse.",
       "Theme": "Thème de la bannière et de la carte",
-      "ThemeHint": "Automatique : suit l'époque choisie avec Bascule d'époque (le thème de chat réglé pour cette époque), sinon le thème des cartes de chat."
+      "ThemeHint": "Automatique : suit l'époque choisie avec Bascule d'époque (le thème de chat réglé pour cette époque), sinon le thème des cartes de chat.",
+      "Rattrapage": "Pousser le jet et dépenser la Chance",
+      "RattrapageHint": "Après les jets, ceux qui ont échoué peuvent pousser leur jet ou dépenser de la Chance depuis la bannière (pas pour la Chance ni la SAN).",
+      "Experience": "Cocher l'expérience",
+      "ExperienceHint": "Une réussite au dé coche la case d'expérience de la compétence, comme un jet normal de CoC7 (pas avec la Chance, ni pour un jet caché)."
     },
     "Banniere": {
       "Kicker": "Lancer de groupe",
@@ -157,6 +161,68 @@
       "montagnes": "Par-delà les Montagnes Hallucinées",
       "ny2026": "New York 2026",
       "antarctique2026": "Antarctique 2026"
+    },
+    "Regle": {
+      "Titre": "Règle du groupe",
+      "Nom": {
+        "chacun": "Chacun pour soi",
+        "un": "Un seul suffit",
+        "tous": "Tous doivent réussir",
+        "majorite": "La majorité"
+      },
+      "Ok": {
+        "un": "Le groupe réussit ! ({ok} sur {total})",
+        "tous": "Tout le groupe réussit !",
+        "majorite": "La majorité réussit ! ({ok} sur {total})"
+      },
+      "Ko": {
+        "un": "Personne ne réussit… le groupe échoue",
+        "tous": "Le groupe échoue ({ok} sur {total})",
+        "majorite": "Pas assez de réussites ({ok} sur {total})"
+      }
+    },
+    "Rattrapage": {
+      "Titre": "Pousser le jet ou dépenser de la Chance ?",
+      "Reflechit": "Réfléchit…",
+      "Pousser": "Pousser",
+      "PousserAide": "Relancer le dé une fois (règle CoC7 : un jet poussé raté a des conséquences)",
+      "Chance": "Chance −{n}",
+      "ChanceAide": "Dépenser des points de Chance pour réussir de justesse (retirés de la fiche)",
+      "AccepterAide": "Garder ce résultat",
+      "Valider": "Valider",
+      "ValiderAide": "Clore le lancer maintenant (les jets en attente sont ignorés)",
+      "Pousse": "Jet poussé",
+      "PousseRate": "Jet poussé raté !",
+      "ChanceDepensee": "Chance −{n}"
+    },
+    "Adversaire": {
+      "Titre": "Contre un adversaire (jet d'opposition)",
+      "Choisir": "Choisir l'adversaire…",
+      "Competence": "Sa compétence…",
+      "CacheOpt": "Son jet caché",
+      "Aide": "Le Gardien lance pour l'adversaire. Chaque investigateur est comparé à lui : meilleur palier, puis plus haute compétence.",
+      "Cache": "Caché",
+      "gagne": "L'emporte sur {nom}",
+      "perd": "Battu par {nom}",
+      "egal": "Égalité avec {nom}",
+      "Contre": "Contre"
+    },
+    "San": {
+      "Titre": "Perte de Santé mentale",
+      "SiReussi": "Réussite",
+      "SiRate": "Échec",
+      "Aide": "Ex. 0/1D4, 1/1D6, 1D4/1D10. Une maladresse fait perdre le maximum. La perte est retirée des fiches.",
+      "Perte": "−{n} SAN",
+      "PerteGrosse": "−{n} SAN · jet d'INT"
+    },
+    "Xp": {
+      "Coche": "Expérience cochée"
+    },
+    "Favori": {
+      "Bouton": "Favori",
+      "Aide": "Enregistrer ce lancer en macro : un clic le relance (Maj + clic pour le modifier)",
+      "Cree": "Macro « {nom} » créée dans ta barre de macros",
+      "MJ": "Seul le Gardien peut lancer un lancer de groupe."
     }
   }
 }

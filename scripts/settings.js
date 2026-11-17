@@ -1,6 +1,18 @@
 export const MODULE_ID = "roll-ensemble-coc7";
 
 export function registerSettings() {
+  game.settings.register(MODULE_ID, "rattrapage", {
+    name: "ROLLENSEMBLECOC7.Settings.Rattrapage",
+    hint: "ROLLENSEMBLECOC7.Settings.RattrapageHint",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+
+  game.settings.register(MODULE_ID, "experience", {
+    name: "ROLLENSEMBLECOC7.Settings.Experience",
+    hint: "ROLLENSEMBLECOC7.Settings.ExperienceHint",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+
   game.settings.register(MODULE_ID, "theme", {
     name: "ROLLENSEMBLECOC7.Settings.Theme",
     hint: "ROLLENSEMBLECOC7.Settings.ThemeHint",
