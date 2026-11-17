@@ -96,3 +96,41 @@ export function determineWinners(participants, teams) {
 export function makeRollId() {
   return foundry.utils.randomID(12);
 }
+
+/**
+ * Lance le d100 avec de vrais dés Foundry (Dice So Nice les affiche).
+ * Avec CoC7 : dés des dizaines du système (« dt ») + 1d10 des unités, comme les jets du système.
+ * @returns {Promise<{roll: number, jet: Roll}>}
+ */
+export async function lancerPourcentage(bonusDice = 0, penaltyDice = 0) {
+  const net = (bonusDice || 0) - (penaltyDice || 0);
+  const n = Math.abs(net) + 1;
+  const dizaines = CONFIG.Dice.terms?.t ? `${n}dt` : `${n}d10`;
+  const jet = await new Roll(`${dizaines} + 1d10`).evaluate();
+  const [dTens, dUnit] = jet.dice;
+  const tensVals = dTens.results.map(r => r.result % 10);
+  const unit = dUnit.results[0].result % 10;
+  const tens = net > 0 ? Math.min(...tensVals) : net < 0 ? Math.max(...tensVals) : tensVals[0];
+  let roll = tens * 10 + unit;
+  if (roll === 0) roll = 100;
+  return { roll, jet };
+}
+
+/** Dice So Nice actif pour ce joueur ? */
+export function dsnActif() {
+  return !!(game.modules.get("dice-so-nice")?.active && game.dice3d);
+}
+
+/**
+ * Montre des dés en 3D chez tout le monde et attend la fin de l'animation.
+ * Jet caché : seuls les Gardiens voient les faces.
+ */
+export async function montrerDes(jets, cache = false) {
+  if (!dsnActif() || !jets.length) return;
+  const gm = cache ? game.users.filter(u => u.isGM).map(u => u.id) : null;
+  try {
+    await Promise.all(jets.map(j => game.dice3d.showForRoll(j, game.user, true, gm, cache)));
+  } catch (e) {
+    console.warn("roll-ensemble-coc7 | Dice So Nice", e);
+  }
+}

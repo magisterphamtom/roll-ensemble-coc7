@@ -73,7 +73,8 @@
       "ToutesComp": "Toutes les compétences",
       "ChercherComp": "Chercher une compétence…",
       "DiffAucune": "Aucune",
-      "DesTous": "Dés bonus / malus (pour tous)"
+      "DesTous": "Dés bonus / malus (pour tous)",
+      "Cache": "Résultats cachés (seul le Gardien les voit)"
     },
     "Spectator": {
       "Title": "Lancer en cours...",
@@ -134,7 +135,10 @@
       "Lancer": "Lancer !",
       "LancerMJ": "Lancer à sa place",
       "Attente": "En attente…",
-      "Difficulte": "Difficulté"
+      "Difficulte": "Difficulté",
+      "JetFait": "Dé lancé",
+      "Secret": "Résultats connus du Gardien seul",
+      "SecretMJ": "Jet caché aux joueurs"
     },
     "Bilan": {
       "Tous": "Tout le groupe réussit !",
@@ -142,7 +146,8 @@
       "Aucun": "Personne ne réussit…",
       "Rate": "Jet raté…",
       "Certains": "{ok} réussite(s) sur {total}",
-      "Compte": "Réussites"
+      "Compte": "Réussites",
+      "Cache": "Le Gardien connaît les résultats…"
     },
     "Theme": {
       "auto": "Automatique (suit l'époque)",

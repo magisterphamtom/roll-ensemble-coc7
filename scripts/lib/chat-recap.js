@@ -34,9 +34,11 @@ export async function postChatRecap(payload) {
     toutOk: b.ok === b.total && !payload.teams,
     aucunOk: b.ok === 0 && !payload.teams
   });
+  const gm = game.users.filter((u) => u.isGM).map((u) => u.id);
   await ChatMessage.create({
     content,
     speaker: ChatMessage.getSpeaker(),
+    ...(payload.cache ? { whisper: gm, blind: true } : {}),
     flags: { [MODULE_ID]: { lancer: payload.id } }
   });
 }

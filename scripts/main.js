@@ -2,6 +2,7 @@ import { MODULE_ID, registerSettings } from "./settings.js";
 import { initSocket } from "./lib/socket.js";
 import { handleRollResponse } from "./lib/roll-manager.js";
 import { RollConfigApp } from "./apps/RollConfigApp.js";
+import { Banniere } from "./apps/Banniere.js";
 import { ouvrirAffichage, appliquerResultat, finaliserAffichage, enBanniere } from "./lib/affichage.js";
 import { RollRequestApp } from "./apps/RollRequestApp.js";
 
@@ -23,6 +24,7 @@ Hooks.once("ready", () => {
       appliquerResultat(data);
       if (game.user.isGM) handleRollResponse(data);
     },
+    reveal: (data) => Banniere.revelerTout(data.id),
     "results-final": (payload) => {
       finaliserAffichage(payload);
     }

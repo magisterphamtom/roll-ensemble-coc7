@@ -1033,3 +1033,9 @@
 .rc-boutons { position: static; margin-top: 6px; background: none; }
 .rc-joueur-nom { white-space: normal; display: block; text-overflow: clip; min-height: 2.3em; }
 .rc-en-ligne { display: inline-block; margin-right: 4px; vertical-align: middle; }
+/* Jet caché */
+.re-b-secret { margin-top: 4px; display: inline-flex; gap: 6px; align-items: center; padding: 3px 12px; border-radius: 12px; font: 600 13px var(--b-label); color: var(--b-plain); background: var(--b-accent); }
+.re-banniere .re-b-secret { font-size: 15px; }
+.re-b-cache { border-color: var(--b-border); }
+.re-b-cache .re-b-valeur { color: var(--b-dim); font-size: 40px; }
+.re-b-cache .re-b-etat { color: var(--b-dim); }

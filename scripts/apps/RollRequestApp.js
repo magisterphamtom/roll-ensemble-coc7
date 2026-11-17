@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../settings.js";
-import { rollPercentile, successLevel, RANK } from "../lib/coc7.js";
+import { lancerPourcentage, montrerDes, successLevel, RANK } from "../lib/coc7.js";
 import { broadcast } from "../lib/socket.js";
 import { appliquerResultat } from "../lib/affichage.js";
 
@@ -38,14 +38,15 @@ export class RollRequestApp extends HandlebarsApplicationMixin(ApplicationV2) {
     return this.data.label || game.i18n.localize("ROLLENSEMBLECOC7.Request.Title");
   }
 
-  static #onRoll(event, target) {
+  static async #onRoll(event, target) {
     if (this.resolved) return;
     this.resolved = true;
     target.disabled = true;
 
     const bonusDice = this.data.dice > 0 ? this.data.dice : 0;
     const penaltyDice = this.data.dice < 0 ? -this.data.dice : 0;
-    const { roll } = rollPercentile(bonusDice, penaltyDice);
+    const { roll, jet } = await lancerPourcentage(bonusDice, penaltyDice);
+    await montrerDes([jet], !!this.data.cache);
     const level = successLevel(roll, this.data.effectiveSkill);
     const rank = RANK[level];
     const meetsThreshold = this.data.requiredRank === null || this.data.requiredRank === undefined

@@ -1,13 +1,15 @@
 import { MODULE_ID } from "../settings.js";
 import { broadcast } from "../lib/socket.js";
-import { rollPercentile, successLevel, determineWinners, makeRollId, RANK } from "../lib/coc7.js";
+import { lancerPourcentage, montrerDes, dsnActif, successLevel, determineWinners, makeRollId, RANK } from "../lib/coc7.js";
+import { broadcast as diffuser } from "../lib/socket.js";
+import { Banniere } from "./Banniere.js";
 import {
   getActorSkills, getSkillValueByLabel, CHARACTERISTICS, getCharacteristicValue,
   SPECIAL_ATTRIBUTES, getSpecialAttributeValue, getActiveOwners
 } from "../lib/actor-skills.js";
 import { registerPendingRoll } from "../lib/roll-manager.js";
 import { postChatRecap } from "../lib/chat-recap.js";
-import { ouvrirAffichage } from "../lib/affichage.js";
+import { ouvrirAffichage, enBanniere } from "../lib/affichage.js";
 import { themeActif } from "../lib/themes.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -38,6 +40,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       setDice: function (e, t) { this.#sync(); const p = this.participants.find(x => x.key === t.dataset.key); if (p) p.dice = Number(t.dataset.value); this.render(); },
       setTeam: function (e, t) { this.#sync(); const p = this.participants.find(x => x.key === t.dataset.key); if (p) p.team = p.team === "A" ? "B" : "A"; this.render(); },
       toggleTeams: function () { this.#sync(); this.teams = !this.teams; this.render(); },
+      toggleCache: function () { this.#sync(); this.cache = !this.cache; this.render(); },
       toggleNpc: function () { this.#sync(); this.npcOpen = !this.npcOpen; this.render(); },
       addAllPlayers: RollConfigApp.#onAddAllPlayers,
       clearAll: function () { this.participants = []; this.render(); }
@@ -55,6 +58,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   difficulty = "none"; // "none" | "regular" | "hard" | "extreme"
   globalDice = 0; // dés bonus/malus appliqués à tous
   npcOpen = false;
+  cache = false; // résultats cachés aux joueurs
   search = "";
   /** @type {{kind: "skill"|"char"|"special", label: string, key?: string}|null} */
   selectedSkill = null;
@@ -117,6 +121,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       theme: themeActif(),
       label: this.label,
       teams: this.teams,
+      cache: this.cache,
       npcOpen: this.npcOpen,
       players, npcs, selected,
       skills, quick, specials, chars,
@@ -330,6 +335,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       label: this.label || skillDisplayLabel || game.i18n.localize("ROLLENSEMBLECOC7.ChatButton"),
       teams: this.teams,
       difficulty: this.difficulty,
+      cache: this.cache,
       theme: themeActif(),
       rollDurationMs: game.settings.get(MODULE_ID, "rollDurationMs"),
       staggerMs: game.settings.get(MODULE_ID, "staggerMs"),
@@ -366,13 +372,15 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const rollId = makeRollId();
 
     const participants = [];
+    const jets = [];
     for (const p of this.participants) {
       const actor = p.actorUuid ? await fromUuid(p.actorUuid) : null;
       const { noSkill, effectiveSkill } = await this.#resolveEffectiveSkill(p, actor);
 
       const bonusDice = p.dice > 0 ? p.dice : 0;
       const penaltyDice = p.dice < 0 ? -p.dice : 0;
-      const { roll } = rollPercentile(bonusDice, penaltyDice);
+      const { roll, jet } = await lancerPourcentage(bonusDice, penaltyDice);
+      jets.push(jet);
       const level = successLevel(roll, effectiveSkill);
       const rank = RANK[level];
       participants.push({
@@ -388,13 +396,19 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       winners: determineWinners(participants, this.teams)
     };
 
+    // Dice So Nice : la bannière fait défiler les chiffres pendant que les dés roulent, puis révèle
+    payload.attente3d = dsnActif() && enBanniere();
     broadcast("start", payload);
     ouvrirAffichage(payload);
+    this.close();
+    if (payload.attente3d) {
+      await montrerDes(jets, payload.cache);
+      diffuser("reveal", { id: rollId });
+      Banniere.revelerTout(rollId);
+    } else montrerDes(jets, payload.cache);
     // La carte du chat arrive quand l'animation a révélé tout le monde
     const attente = payload.rollDurationMs + Math.max(0, participants.length - 1) * payload.staggerMs + 400;
     setTimeout(() => postChatRecap(payload), attente);
-
-    this.close();
   }
 
   /**
@@ -435,6 +449,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
         effectiveSkill,
         dice: p.dice,
         requiredRank,
+        cache: this.cache,
         rollId,
         label: this.label || skillDisplayLabel
       });

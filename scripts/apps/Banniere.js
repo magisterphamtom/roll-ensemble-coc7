@@ -3,7 +3,7 @@
  * le dé à lancer, les portraits des participants, et chaque joueur lance depuis son portrait.
  */
 import { MODULE_ID } from "../settings.js";
-import { rollPercentile, successLevel, RANK, LEVEL_COLOR } from "../lib/coc7.js";
+import { lancerPourcentage, montrerDes, successLevel, RANK, LEVEL_COLOR } from "../lib/coc7.js";
 import { broadcast } from "../lib/socket.js";
 import { handleRollResponse } from "../lib/roll-manager.js";
 import { effetCritique } from "../lib/effets.js";
@@ -31,6 +31,11 @@ export class Banniere {
 
   static appliquer(data) {
     if (courante?.payload.id === data.rollId) courante.reveler(data);
+  }
+
+  /** Lancer du Gardien avec Dice So Nice : les dés ont fini de rouler, on révèle. */
+  static revelerTout(id) {
+    if (courante?.payload.id === id) courante.#revelerTout();
   }
 
   static finaliser(payload) {
@@ -102,6 +107,7 @@ export class Banniere {
             <div class="re-b-kicker">${L("Banniere.Kicker")}${memeDes}</div>
             <h2>${esc(label)}</h2>
             ${sous ? `<div class="re-b-sous">${esc(sous)}</div>` : ""}
+            ${this.payload.cache ? `<div class="re-b-secret"><i class="fa-solid fa-eye-slash"></i> ${L(game.user.isGM ? "Banniere.SecretMJ" : "Banniere.Secret")}</div>` : ""}
           </div>
         </div>
         <div class="re-b-cartes">${cartes}</div>
@@ -121,6 +127,7 @@ export class Banniere {
   #faireTourner(key) {
     const v = this.#ligne(key)?.querySelector(".re-b-zone");
     if (!v) return;
+    this.#arreter(key);
     v.innerHTML = `<span class="re-b-valeur re-b-tourne">--</span>`;
     const span = v.firstElementChild;
     this.tourne.set(key, setInterval(() => { span.textContent = pad(Math.ceil(Math.random() * 100)); }, 60));
@@ -136,8 +143,21 @@ export class Banniere {
     const resolus = participants.filter((p) => !p.pending);
     if (playSound && resolus.length) jouer(soundRoll);
     resolus.forEach((p) => this.#faireTourner(p.key));
+    if (this.payload.attente3d) return; // la révélation attend la fin des dés 3D
     await Promise.all(resolus.map((p, i) => new Promise((r) => setTimeout(() => { this.#afficher(p); r(); }, rollDurationMs + i * staggerMs))));
     if (!participants.some((p) => p.pending) && this.payload.winners) this.#conclure();
+  }
+
+  async #revelerTout() {
+    const { participants, staggerMs } = this.payload;
+    const resolus = participants.filter((p) => !p.pending);
+    await Promise.all(resolus.map((p, i) => new Promise((r) => setTimeout(() => { this.#afficher(p); r(); }, 200 + i * staggerMs))));
+    if (!participants.some((p) => p.pending) && this.payload.winners) this.#conclure();
+  }
+
+  /** Résultat caché aux joueurs : ils voient seulement que le dé a été lancé. */
+  get #masque() {
+    return !!this.payload.cache && !game.user.isGM;
   }
 
   /** Affiche le résultat d'un participant sur sa carte (et lance l'effet des 01 / maladresses). */
@@ -146,13 +166,20 @@ export class Banniere {
     if (!carte || p.roll == null) return;
     this.#arreter(p.key);
     this.reveles.set(p.key, p.roll);
+    if (this.#masque) {
+      carte.classList.remove("re-b-en-attente");
+      carte.classList.add("re-b-revele", "re-b-cache");
+      carte.querySelector(".re-b-zone").innerHTML = `<span class="re-b-valeur"><i class="fa-solid fa-eye-slash"></i></span>`;
+      carte.querySelector(".re-b-etat").textContent = L("Banniere.JetFait");
+      return;
+    }
     const e = etat(p, this.requis);
     carte.classList.remove("re-b-en-attente", "re-b-ok", "re-b-ko", "re-b-crit", "re-b-fumble");
     carte.classList.add("re-b-revele", `re-b-${e}`);
     carte.style.setProperty("--re-niveau", LEVEL_COLOR[p.level]);
     carte.querySelector(".re-b-zone").innerHTML = `<span class="re-b-valeur">${pad(p.roll)}</span>`;
     carte.querySelector(".re-b-etat").innerHTML = `<i class="${ICONE[e]}"></i> ${L(`Level.${p.level}`)}`;
-    if ((p.level === "critical" || p.level === "fumble") && !this.effets.has(p.key)) {
+    if ((p.level === "critical" || p.level === "fumble") && !this.effets.has(p.key) && !this.#masque) {
       this.effets.add(p.key);
       effetCritique({
         kind: p.level, actorUuid: p.actorUuid, nom: p.name, img: p.img,
@@ -162,13 +189,15 @@ export class Banniere {
   }
 
   /** Un joueur (ou le Gardien à sa place) lance depuis la bannière. */
-  #lancer(bouton) {
+  async #lancer(bouton) {
     const p = this.payload.participants.find((x) => x.key === bouton.dataset.key);
-    if (!p?.pending) return;
+    if (!p?.pending || bouton.disabled) return;
     bouton.disabled = true;
     const bonus = p.dice > 0 ? p.dice : 0;
     const malus = p.dice < 0 ? -p.dice : 0;
-    const { roll } = rollPercentile(bonus, malus);
+    const { roll, jet } = await lancerPourcentage(bonus, malus);
+    this.#faireTourner(p.key);
+    await montrerDes([jet], this.payload.cache); // les dés 3D roulent chez tout le monde
     const level = successLevel(roll, p.effectiveSkill);
     const rank = RANK[level];
     const result = {
@@ -203,11 +232,11 @@ export class Banniere {
     if (this.fini || !this.el) return;
     this.fini = true;
     const { participants, winners, playSound, soundComplete, soundFumble, autoCloseSeconds } = this.payload;
-    for (const k of winners?.winnerKeys ?? []) this.#ligne(k)?.classList.add("re-b-gagnant");
-    if (playSound) jouer(participants.some((p) => p.level === "fumble") && soundFumble ? soundFumble : soundComplete);
+    if (!this.#masque) for (const k of winners?.winnerKeys ?? []) this.#ligne(k)?.classList.add("re-b-gagnant");
+    if (playSound) jouer(participants.some((p) => p.level === "fumble") && soundFumble && !this.#masque ? soundFumble : soundComplete);
     const b = bilan(this.payload);
     const v = this.el.querySelector(".re-b-verdict");
-    v.textContent = b.verdict;
+    v.textContent = this.#masque ? L("Bilan.Cache") : b.verdict;
     v.classList.add("re-b-visible");
     if (autoCloseSeconds > 0) setTimeout(() => this.fermer(), autoCloseSeconds * 1000);
   }

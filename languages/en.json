@@ -73,7 +73,8 @@
       "ToutesComp": "All skills",
       "ChercherComp": "Search a skill…",
       "DiffAucune": "None",
-      "DesTous": "Bonus / penalty dice (everyone)"
+      "DesTous": "Bonus / penalty dice (everyone)",
+      "Cache": "Hidden results (Keeper only)"
     },
     "Spectator": {
       "Title": "Rolling...",
@@ -134,7 +135,10 @@
       "Lancer": "Roll!",
       "LancerMJ": "Roll for them",
       "Attente": "Waiting…",
-      "Difficulte": "Difficulty"
+      "Difficulte": "Difficulty",
+      "JetFait": "Rolled",
+      "Secret": "Only the Keeper sees the results",
+      "SecretMJ": "Hidden from players"
     },
     "Bilan": {
       "Tous": "The whole group succeeds!",
@@ -142,7 +146,8 @@
       "Aucun": "Nobody succeeds…",
       "Rate": "Failed…",
       "Certains": "{ok} success(es) out of {total}",
-      "Compte": "Successes"
+      "Compte": "Successes",
+      "Cache": "The Keeper knows the results…"
     },
     "Theme": {
       "auto": "Automatic (follows the era)",

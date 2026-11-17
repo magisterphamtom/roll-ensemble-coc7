@@ -118,6 +118,10 @@
         <span class="rc-bascule"></span> {{localize "ROLLENSEMBLECOC7.Config.Teams"}}
       </button>
 
+      <button type="button" class="rc-interrupteur {{#if cache}}rc-actif{{/if}}" data-action="toggleCache">
+        <span class="rc-bascule"></span> <i class="fa-solid fa-eye-slash"></i> {{localize "ROLLENSEMBLECOC7.Config.Cache"}}
+      </button>
+
       <div class="rc-groupe-nom">{{localize "ROLLENSEMBLECOC7.Config.Participants"}} <span class="rc-badge">{{selected.length}}</span></div>
       <div class="rc-participants">
         {{#each selected}}
