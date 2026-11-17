@@ -112,7 +112,9 @@
       "AffichageBanniere": "Bannière (portraits)",
       "AffichageFenetre": "Fenêtre (ancienne présentation)",
       "EffetsCritiques": "Effets des 01 et maladresses",
-      "EffetsCritiquesHint": "Affiche les cartes plein écran du module Critiques du Mythe (s'il est actif) sur une réussite critique ou une maladresse."
+      "EffetsCritiquesHint": "Affiche les cartes plein écran du module Critiques du Mythe (s'il est actif) sur une réussite critique ou une maladresse.",
+      "Theme": "Thème de la bannière et de la carte",
+      "ThemeHint": "Automatique : suit l'époque choisie avec Bascule d'époque (le thème de chat réglé pour cette époque), sinon le thème des cartes de chat."
     },
     "Banniere": {
       "Kicker": "Lancer de groupe",
@@ -128,6 +130,15 @@
       "Rate": "Jet raté…",
       "Certains": "{ok} réussite(s) sur {total}",
       "Compte": "Réussites"
+    },
+    "Theme": {
+      "auto": "Automatique (suit l'époque)",
+      "classique": "Classique (papier et laiton)",
+      "annees20": "Années 20",
+      "newyork": "New York, années 20",
+      "montagnes": "Par-delà les Montagnes Hallucinées",
+      "ny2026": "New York 2026",
+      "antarctique2026": "Antarctique 2026"
     }
   }
 }

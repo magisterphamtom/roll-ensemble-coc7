@@ -8,6 +8,7 @@ import {
 import { registerPendingRoll } from "../lib/roll-manager.js";
 import { postChatRecap } from "../lib/chat-recap.js";
 import { ouvrirAffichage } from "../lib/affichage.js";
+import { themeActif } from "../lib/themes.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -294,6 +295,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       label: this.label || skillDisplayLabel || game.i18n.localize("ROLLENSEMBLECOC7.ChatButton"),
       teams: this.teams,
       difficulty: this.difficulty,
+      theme: themeActif(),
       rollDurationMs: game.settings.get(MODULE_ID, "rollDurationMs"),
       staggerMs: game.settings.get(MODULE_ID, "staggerMs"),
       autoCloseSeconds: game.settings.get(MODULE_ID, "autoCloseSeconds"),

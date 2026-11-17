@@ -93,7 +93,7 @@ export class Banniere {
 
     const el = document.createElement("div");
     el.id = "re-banniere";
-    el.className = `re-banniere ${teams ? "re-b-equipes" : ""}`;
+    el.className = `re-banniere re-t-${this.payload.theme ?? "classique"} ${teams ? "re-b-equipes" : ""}`;
     el.innerHTML = `<div class="re-b-bande">
         <button type="button" class="re-b-fermer" title="${L("Spectator.Close")}"><i class="fa-solid fa-xmark"></i></button>
         <div class="re-b-tete">

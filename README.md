@@ -13,7 +13,7 @@ Utile pour une fuite dans les catacombes, une recherche d'indices à plusieurs, 
 - **Bannière chez tout le monde** (nouveau en 1.1) : un bandeau s'affiche sur l'écran de chaque joueur avec le nom du jet, le d100 et les dés bonus/malus, et les portraits des personnages choisis. Chaque joueur clique sur **Lancer !** sous son portrait ; tout le monde voit les résultats apparaître en direct, puis le bilan du groupe. Le Gardien peut lancer à la place d'un joueur absent.
 - **Carte de chat récapitulative** (nouveau en 1.1) : tous les participants avec leur portrait, leur score, le jet, une coche verte (réussite), une croix rouge (échec), une étoile (01, réussite critique), une tête de mort (maladresse), une couronne pour le meilleur, et le bilan (« 3 réussites sur 5 », « Tout le groupe réussit ! », équipe gagnante).
 - **01 et maladresses** (nouveau en 1.1) : si le module **Critiques du Mythe** est actif, ses cartes plein écran s'affichent, aux couleurs de l'époque (plusieurs critiques passent l'un après l'autre).
-- **Aux couleurs de l'époque** : avec **CoC7 – Cartes de chat thématiques**, la bannière et la carte prennent le thème actif (Années 20, Montagnes Hallucinées, 2026…).
+- **Six thèmes** : Classique, Années 20, New York années 20, Par-delà les Montagnes Hallucinées, New York 2026, Antarctique 2026. En « Automatique » (par défaut), le thème suit l'époque choisie avec **Bascule d'époque**, sinon le thème des **Cartes de chat thématiques**.
 - **Compétences du système** : le jet utilise la valeur réelle de chaque fiche (compétences, caractéristiques, Chance, Santé Mentale). Si un participant n'a pas la compétence, c'est signalé.
 - **Règles CoC7** : dés bonus et malus (de ×1 à ×2), modificateur en pourcentage, paliers Échec critique / Échec / Réussite normale / difficile / extrême / critique.
 - **Difficulté requise** (facultative) : chaque résultat est comparé à un palier minimum, affiché « Réussi » ou « Échoué ».
@@ -51,6 +51,7 @@ Dans les réglages du module (Gardien) :
 | Durée de l'animation (ms) | 1500 |
 | Délai entre chaque participant (ms) | 500 |
 | Fermeture automatique (secondes, 0 = manuelle) | 8 |
+| Thème de la bannière et de la carte | automatique (suit l'époque) |
 | Affichage du lancer : bannière (portraits) ou fenêtre (ancienne présentation) | bannière |
 | Effets des 01 et maladresses (module Critiques du Mythe) | oui |
 
@@ -64,5 +65,8 @@ Une maladresse suit la règle de CoC7 : 100, ou 96 à 100 si la valeur visée es
 - Les jets en équipe de plusieurs joueurs passent par les sockets de Foundry : le module doit être activé chez le Gardien et chez les joueurs.
 
 ## Crédits
+
+Polices des thèmes (dossier `fonts/`, licence SIL OFL 1.1) : Limelight, Poiret One, IM Fell English, Inter, Rajdhani.
+
 
 Code : magisterphamtom (licence MIT).

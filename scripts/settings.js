@@ -1,6 +1,24 @@
 export const MODULE_ID = "roll-ensemble-coc7";
 
 export function registerSettings() {
+  game.settings.register(MODULE_ID, "theme", {
+    name: "ROLLENSEMBLECOC7.Settings.Theme",
+    hint: "ROLLENSEMBLECOC7.Settings.ThemeHint",
+    scope: "world",
+    config: true,
+    type: String,
+    choices: {
+      auto: "ROLLENSEMBLECOC7.Theme.auto",
+      classique: "ROLLENSEMBLECOC7.Theme.classique",
+      annees20: "ROLLENSEMBLECOC7.Theme.annees20",
+      newyork: "ROLLENSEMBLECOC7.Theme.newyork",
+      montagnes: "ROLLENSEMBLECOC7.Theme.montagnes",
+      ny2026: "ROLLENSEMBLECOC7.Theme.ny2026",
+      antarctique2026: "ROLLENSEMBLECOC7.Theme.antarctique2026"
+    },
+    default: "auto"
+  });
+
   game.settings.register(MODULE_ID, "affichage", {
     name: "ROLLENSEMBLECOC7.Settings.Affichage",
     hint: "ROLLENSEMBLECOC7.Settings.AffichageHint",

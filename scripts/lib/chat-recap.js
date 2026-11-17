@@ -23,6 +23,7 @@ export async function postChatRecap(payload) {
   const b = bilan(payload);
   const competence = payload.participants[0]?.skillLabel ?? "";
   const content = await foundry.applications.handlebars.renderTemplate(`modules/${MODULE_ID}/templates/chat-recap.hbs`, {
+    theme: payload.theme ?? "classique",
     label: payload.label,
     sous: [payload.label !== competence ? competence : "",
       requis !== null ? `${game.i18n.localize("ROLLENSEMBLECOC7.Banniere.Difficulte")} : ${game.i18n.localize(`ROLLENSEMBLECOC7.Level.${payload.difficulty}`)}` : ""]
