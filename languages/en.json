@@ -186,14 +186,17 @@
       "Reflechit": "Thinking…",
       "Pousser": "Push",
       "PousserAide": "Reroll once (a failed pushed roll has consequences)",
-      "Chance": "Luck −{n}",
+      "Chance": "Spend {n}",
       "ChanceAide": "Spend Luck to just succeed",
       "AccepterAide": "Keep this result",
       "Valider": "Confirm",
       "ValiderAide": "Close the roll now",
       "Pousse": "Pushed",
       "PousseRate": "Failed push!",
-      "ChanceDepensee": "Luck −{n}"
+      "ChanceDepensee": "Luck −{n}",
+      "ChanceCompte": "Luck {dispo} − {cout} = {reste} left",
+      "ChanceManque": "Luck {dispo}: {cout} needed",
+      "ChanceDepenseeReste": "Luck −{n} ({reste} left)"
     },
     "Adversaire": {
       "Titre": "Against an opponent (opposed roll)",

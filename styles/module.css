@@ -1113,3 +1113,8 @@
 .rc-petit-inter.rc-actif { background: var(--b-accent); color: var(--b-plain); border-color: var(--b-accent); }
 .rc-droite .rc-tuile { padding: 6px 2px; font-size: 12.5px; }
 .re-b-mentions .re-m { white-space: normal; text-align: center; justify-content: center; line-height: 1.15; }
+/* 1.3 — Compteur de Chance sous le portrait */
+.re-b-actions { flex-direction: row; }
+.re-b-chance-info { flex-basis: 100%; text-align: center; font: 600 13px var(--b-label); color: #3fae5a; white-space: nowrap; }
+.re-banniere .re-b-chance-info { font-size: 14px; }
+.re-b-chance-info.re-b-chance-manque { color: var(--b-dim); font-weight: 400; font-style: italic; }

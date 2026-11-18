@@ -8,7 +8,7 @@ import { lancerPourcentage, montrerDes, successLevel, RANK, LEVEL_COLOR } from "
 import { broadcast } from "../lib/socket.js";
 import { handleRollResponse, handleAjustement, forcerFin } from "../lib/roll-manager.js";
 import { effetCritique } from "../lib/effets.js";
-import { palierRequis, etat, ICONE, desHTML, bilan, graine, options, mentions, seuilValeur } from "../lib/resultat.js";
+import { palierRequis, etat, ICONE, desHTML, bilan, graine, options, mentions, seuilValeur, coutChance } from "../lib/resultat.js";
 import { getLuckValue } from "../lib/actor-skills.js";
 import { tourner, arreter } from "../lib/ticker.js";
 
@@ -287,10 +287,19 @@ export class Banniere {
     const zone = this.#ligne(p.key)?.querySelector(".re-b-actions");
     if (!zone) return;
     const peut = this.#peutAgir(p);
-    const o = options(p, this.payload, getLuckValue(acteurSync(p.actorUuid)));
+    const dispo = getLuckValue(acteurSync(p.actorUuid));
+    const o = options(p, this.payload, dispo);
     if (this.phase !== "rattrapage" || this.fini || (!o.pousser && !o.chance)) { zone.innerHTML = ""; return; }
     if (!peut) { zone.innerHTML = `<span class="re-b-reflechit"><i class="fa-solid fa-hourglass-half"></i> ${L("Rattrapage.Reflechit")}</span>`; return; }
-    zone.innerHTML = [
+    // Compteur de Chance : ce qu'il a, ce qu'il faut, ce qui restera
+    const cout = coutChance(p, this.payload);
+    let compteur = "";
+    if (cout != null && dispo != null) {
+      compteur = cout <= dispo
+        ? `<div class="re-b-chance-info"><i class="fa-solid fa-clover"></i> ${L("Rattrapage.ChanceCompte", { dispo, cout, reste: dispo - cout })}</div>`
+        : `<div class="re-b-chance-info re-b-chance-manque"><i class="fa-solid fa-clover"></i> ${L("Rattrapage.ChanceManque", { dispo, cout })}</div>`;
+    }
+    zone.innerHTML = compteur + [
       o.pousser ? `<button type="button" data-key="${p.key}" data-act="pousser" title="${L("Rattrapage.PousserAide")}"><i class="fa-solid fa-hand-fist"></i> ${L("Rattrapage.Pousser")}</button>` : "",
       o.chance ? `<button type="button" data-key="${p.key}" data-act="chance" data-cout="${o.chance}" title="${L("Rattrapage.ChanceAide")}"><i class="fa-solid fa-clover"></i> ${L("Rattrapage.Chance", { n: o.chance })}</button>` : "",
       `<button type="button" data-key="${p.key}" data-act="accepter" title="${L("Rattrapage.AccepterAide")}"><i class="fa-solid fa-check"></i></button>`
@@ -310,7 +319,7 @@ export class Banniere {
     this.#ligne(p.key)?.querySelectorAll(".re-b-actions button").forEach((b) => { b.disabled = true; });
     await a.update({ "system.attribs.luck.value": dispo - cout });
     const rang = this.requis ?? RANK.regular;
-    this.#envoyerAjustement(p, { luckSpent: cout, rangJet: p.rangJet ?? p.rank, rank: rang, level: NIVEAU[rang], meetsThreshold: this.requis === null ? null : true });
+    this.#envoyerAjustement(p, { luckSpent: cout, luckRestant: dispo - cout, rangJet: p.rangJet ?? p.rank, rank: rang, level: NIVEAU[rang], meetsThreshold: this.requis === null ? null : true });
   }
 
   #envoyerAjustement(p, changes) {

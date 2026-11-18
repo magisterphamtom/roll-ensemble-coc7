@@ -186,14 +186,17 @@
       "Reflechit": "Réfléchit…",
       "Pousser": "Pousser",
       "PousserAide": "Relancer le dé une fois (règle CoC7 : un jet poussé raté a des conséquences)",
-      "Chance": "Chance −{n}",
+      "Chance": "Dépenser {n}",
       "ChanceAide": "Dépenser des points de Chance pour réussir de justesse (retirés de la fiche)",
       "AccepterAide": "Garder ce résultat",
       "Valider": "Valider",
       "ValiderAide": "Clore le lancer maintenant (les jets en attente sont ignorés)",
       "Pousse": "Jet poussé",
       "PousseRate": "Jet poussé raté !",
-      "ChanceDepensee": "Chance −{n}"
+      "ChanceDepensee": "Chance −{n}",
+      "ChanceCompte": "Chance {dispo} − {cout} = reste {reste}",
+      "ChanceManque": "Chance {dispo} : il en faut {cout}",
+      "ChanceDepenseeReste": "Chance −{n} (reste {reste})"
     },
     "Adversaire": {
       "Titre": "Contre un adversaire (jet d'opposition)",

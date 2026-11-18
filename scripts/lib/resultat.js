@@ -63,6 +63,18 @@ export function desHTML(dice) {
   return `<span class="re-des ${cls}" title="${titre}">${'<i class="fa-solid fa-dice-d10"></i>'.repeat(n)}</span>`;
 }
 
+/**
+ * Points de Chance qu'il faudrait dépenser pour réussir de justesse ce jet raté
+ * (null si la Chance ne peut pas servir ici : réussite, maladresse, jet poussé, Chance/SAN, adversaire…).
+ */
+export function coutChance(p, payload) {
+  if (!payload?.rattrapage || payload.cache || p.pending || p.roll == null) return null;
+  if (p.level === "fumble" || estReussi(p, payload) || p.pushed || p.luckSpent || p.noSkill) return null;
+  if (payload.skillKind === "special" || payload.adversaire) return null;
+  const cout = p.roll - seuilValeur(p, payload);
+  return cout > 0 ? cout : null;
+}
+
 /** Ce qu'un participant peut encore faire après son jet : pousser, dépenser de la Chance. */
 export function options(p, payload, chanceDispo = null) {
   const r = { pousser: false, chance: null };
@@ -112,7 +124,7 @@ export function bilan(payload) {
 export function mentions(p, payload) {
   const m = [];
   if (p.pushed) m.push({ cls: p.level === "fumble" || !estReussi(p, payload) ? "re-m-pousse-rate" : "re-m-pousse", icone: "fa-solid fa-hand-fist", texte: L(estReussi(p, payload) ? "Rattrapage.Pousse" : "Rattrapage.PousseRate") });
-  if (p.luckSpent) m.push({ cls: "re-m-chance", icone: "fa-solid fa-clover", texte: L("Rattrapage.ChanceDepensee", { n: p.luckSpent }) });
+  if (p.luckSpent) m.push({ cls: "re-m-chance", icone: "fa-solid fa-clover", texte: p.luckRestant != null ? L("Rattrapage.ChanceDepenseeReste", { n: p.luckSpent, reste: p.luckRestant }) : L("Rattrapage.ChanceDepensee", { n: p.luckSpent }) });
   if (payload.adversaire) {
     const v = versus(p, payload.adversaire);
     if (v) m.push({ cls: `re-m-${v}`, icone: v === "gagne" ? "fa-solid fa-trophy" : v === "egal" ? "fa-solid fa-equals" : "fa-solid fa-shield-halved", texte: L(`Adversaire.${v}`, { nom: payload.adversaire.name }) });
