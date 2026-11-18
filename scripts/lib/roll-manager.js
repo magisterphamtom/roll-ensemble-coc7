@@ -118,12 +118,15 @@ async function appliquerPertesSan(payload) {
   }
 }
 
-/** Case d'expérience cochée sur une réussite au dé (comme un jet normal de CoC7 ; pas avec la Chance). */
+/**
+ * Case d'expérience cochée sur une réussite au premier jet, comme un jet normal de CoC7.
+ * Règle : pas d'expérience si la réussite vient d'un jet poussé ou de la Chance dépensée.
+ */
 async function cocherExperience(payload) {
   if (!payload.experience || payload.skillKind !== "skill" || payload.cache) return;
   try { if (!game.settings.get("CoC7", "xpEnabled")) return; } catch { /* autre système : on coche quand même */ }
   for (const p of payload.participants) {
-    if (p.pending || (p.rangJet ?? p.rank) < RANK.regular) continue;
+    if (p.pending || p.pushed || p.luckSpent || (p.rangJet ?? p.rank) < RANK.regular) continue;
     const a = await acteur(p.actorUuid);
     const item = getSkillItemByLabel(a, payload.skillLabel);
     if (!item || item.system?.properties?.noxpgain) continue;

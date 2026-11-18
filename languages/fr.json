@@ -132,7 +132,7 @@
       "Rattrapage": "Pousser le jet et dépenser la Chance",
       "RattrapageHint": "Après les jets, ceux qui ont échoué peuvent pousser leur jet ou dépenser de la Chance depuis la bannière (pas pour la Chance ni la SAN).",
       "Experience": "Cocher l'expérience",
-      "ExperienceHint": "Une réussite au dé coche la case d'expérience de la compétence, comme un jet normal de CoC7 (pas avec la Chance, ni pour un jet caché)."
+      "ExperienceHint": "Une réussite au premier jet coche la case d'expérience de la compétence, comme un jet normal de CoC7. Pas d'expérience si le jet a été poussé ou si de la Chance a été dépensée, ni pour un jet caché."
     },
     "Banniere": {
       "Kicker": "Lancer de groupe",

@@ -132,7 +132,7 @@
       "Rattrapage": "Push rolls and spend Luck",
       "RattrapageHint": "After rolling, failed investigators may push or spend Luck from the banner.",
       "Experience": "Check experience",
-      "ExperienceHint": "A rolled success checks the skill's experience box."
+      "ExperienceHint": "A first-roll success checks the skill's experience box. No experience for pushed rolls, spent Luck or hidden rolls."
     },
     "Banniere": {
       "Kicker": "Group roll",
