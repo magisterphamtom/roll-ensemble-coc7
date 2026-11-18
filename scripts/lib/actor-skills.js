@@ -75,7 +75,7 @@ export function getSpecialAttributeValue(actor, key) {
   if (!actor) return 0;
   const candidates = key === "san"
     ? [actor.system?.attribs?.san, actor.system?.sanity, actor.system?.san]
-    : [actor.system?.attribs?.luck, actor.system?.luck];
+    : [actor.system?.attribs?.lck, actor.system?.attribs?.luck, actor.system?.luck]; // CoC7 : attribs.lck
   for (const node of candidates) {
     if (node && typeof node === "object" && "value" in node) return Number(node.value) || 0;
     if (typeof node === "number") return node;
@@ -99,9 +99,14 @@ export function getSkillItemByLabel(actor, label) {
   return s ? actor.items.get(s.id) : null;
 }
 
-/** Chance actuelle (null si la fiche n'en a pas). */
+/** Chance actuelle (null si la fiche n'en a pas). Dans CoC7, elle est rangée sous system.attribs.lck. */
 export function getLuckValue(actor) {
-  const n = actor?.system?.attribs?.luck;
+  const n = actor?.system?.attribs?.lck ?? actor?.system?.attribs?.luck;
   if (n && typeof n === "object" && "value" in n) return Number(n.value) || 0;
   return null;
+}
+
+/** Chemin de la Chance à mettre à jour sur la fiche. */
+export function luckPath(actor) {
+  return actor?.system?.attribs?.lck ? "system.attribs.lck.value" : "system.attribs.luck.value";
 }

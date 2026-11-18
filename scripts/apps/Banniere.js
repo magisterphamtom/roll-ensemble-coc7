@@ -9,7 +9,7 @@ import { broadcast } from "../lib/socket.js";
 import { handleRollResponse, handleAjustement, forcerFin } from "../lib/roll-manager.js";
 import { effetCritique } from "../lib/effets.js";
 import { palierRequis, etat, ICONE, desHTML, bilan, graine, options, mentions, seuilValeur, coutChance } from "../lib/resultat.js";
-import { getLuckValue } from "../lib/actor-skills.js";
+import { getLuckValue, luckPath } from "../lib/actor-skills.js";
 import { tourner, arreter } from "../lib/ticker.js";
 
 const L = (k, d) => (d ? game.i18n.format(`ROLLENSEMBLECOC7.${k}`, d) : game.i18n.localize(`ROLLENSEMBLECOC7.${k}`));
@@ -317,7 +317,7 @@ export class Banniere {
     const dispo = getLuckValue(a);
     if (!a || dispo == null || cout > dispo) return;
     this.#ligne(p.key)?.querySelectorAll(".re-b-actions button").forEach((b) => { b.disabled = true; });
-    await a.update({ "system.attribs.luck.value": dispo - cout });
+    await a.update({ [luckPath(a)]: dispo - cout });
     const rang = this.requis ?? RANK.regular;
     this.#envoyerAjustement(p, { luckSpent: cout, luckRestant: dispo - cout, rangJet: p.rangJet ?? p.rank, rank: rang, level: NIVEAU[rang], meetsThreshold: this.requis === null ? null : true });
   }
