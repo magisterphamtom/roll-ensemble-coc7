@@ -10,7 +10,7 @@ import {
 import { creerMacroFavori } from "../lib/favoris.js";
 import { registerRoll, apresJets } from "../lib/roll-manager.js";
 import { ouvrirAffichage, enBanniere } from "../lib/affichage.js";
-import { themeActif } from "../lib/themes.js";
+import { themeActif, THEMES } from "../lib/themes.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -65,6 +65,8 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
   npcOpen = false;
   cache = false; // résultats cachés aux joueurs
   regle = "chacun"; // chacun | un | tous | majorite
+  /** Thème choisi à la volée dans la fenêtre (null = réglage du module, « auto » = suit l'époque) */
+  themeChoix = RollConfigApp.dernierTheme ?? null;
   perteSan = { ok: "0", ko: "1D6" };
   tousJoueurs = false;
   /** Jet d'opposition contre un adversaire lancé par le Gardien */
@@ -142,8 +144,11 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       ...CHARACTERISTICS.map(c => ({ v: val("char", c.key), label: `${c.label} (×5)`, selected: sk?.kind === "char" && sk.key === c.key }))
     ] : [];
 
+    const reglage = (() => { try { return game.settings.get(MODULE_ID, "theme"); } catch { return "auto"; } })();
+    const courant = this.themeChoix ?? reglage;
     return {
-      theme: themeActif(),
+      themes: ["auto", ...THEMES].map(v => ({ v, label: L(`Theme.${v}`), selected: courant === v })),
+      theme: themeActif(this.themeChoix),
       regles: ["chacun", "un", "tous", "majorite"].map(v => ({ v, actif: this.regle === v, label: L(`Regle.Nom.${v}`) })),
       adversaire: { ...this.adversaire, acteurs: advActeurs, skills: advSkills, actorName: advActor?.name,
         crans: [-2, -1, 0, 1, 2].map(v => ({ v, actif: this.adversaire.dice === v, cls: v < 0 ? "malus" : v > 0 ? "bonus" : "normal", n: Math.abs(v) })) },
@@ -178,6 +183,8 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!el) return;
     const label = el.querySelector('[name="label"]');
     if (label) this.label = label.value;
+    const th = el.querySelector('[name="themeChoix"]');
+    if (th) this.themeChoix = th.value || null;
     for (const p of this.participants) {
       const m = el.querySelector(`[name="modifier-${p.key}"]`);
       if (m) p.modifier = Number(m.value) || 0;
@@ -241,6 +248,13 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const theme = context.theme ?? "classique";
     this.element.classList.remove(...[...this.element.classList].filter(c => c.startsWith("re-t-")));
     this.element.classList.add("re-cfg", `re-t-${theme}`);
+
+    // Thème choisi à la volée : la fenêtre change tout de suite (et le choix est gardé jusqu'au rechargement)
+    this.element.querySelector('[name="themeChoix"]')?.addEventListener("change", (ev) => {
+      this.#sync();
+      RollConfigApp.dernierTheme = this.themeChoix;
+      this.render();
+    });
 
     // Choix de l'adversaire : recharge la liste de ses compétences
     this.element.querySelector('[name="advActor"]')?.addEventListener("change", () => { this.#sync(); this.render(); });
@@ -387,7 +401,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
       rattrapage: game.settings.get(MODULE_ID, "rattrapage") && enBanniere(),
       experience: game.settings.get(MODULE_ID, "experience"),
       perteSan: sk.kind === "special" && sk.key === "san" ? { ...this.perteSan } : null,
-      theme: themeActif(),
+      theme: themeActif(this.themeChoix),
       rollDurationMs: game.settings.get(MODULE_ID, "rollDurationMs"),
       staggerMs: game.settings.get(MODULE_ID, "staggerMs"),
       autoCloseSeconds: game.settings.get(MODULE_ID, "autoCloseSeconds"),
@@ -452,7 +466,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.#sync();
     return {
       label: this.label, skill: this.selectedSkill, difficulty: this.difficulty, globalDice: this.globalDice,
-      teams: this.teams, cache: this.cache, regle: this.regle, perteSan: this.perteSan,
+      teams: this.teams, cache: this.cache, regle: this.regle, perteSan: this.perteSan, themeChoix: this.themeChoix,
       adversaire: this.adversaire.on ? { ...this.adversaire } : null,
       tousJoueurs: this.tousJoueurs,
       participants: this.participants.map(p => ({ actorUuid: p.actorUuid, modifier: p.modifier, dice: p.dice, team: p.team, forceGM: p.forceGM }))
@@ -464,7 +478,7 @@ export class RollConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     Object.assign(this, {
       label: f.label ?? "", selectedSkill: f.skill ?? null, difficulty: f.difficulty ?? "none", globalDice: f.globalDice ?? 0,
       teams: !!f.teams, cache: !!f.cache, regle: f.regle ?? "chacun", perteSan: f.perteSan ?? this.perteSan,
-      tousJoueurs: !!f.tousJoueurs
+      tousJoueurs: !!f.tousJoueurs, themeChoix: f.themeChoix ?? this.themeChoix
     });
     if (f.adversaire) this.adversaire = { ...this.adversaire, ...f.adversaire, on: true };
     this.participants = [];

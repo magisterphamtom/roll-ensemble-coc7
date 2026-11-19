@@ -74,7 +74,8 @@
       "ChercherComp": "Chercher une compétence…",
       "DiffAucune": "Aucune",
       "DesTous": "Dés bonus / malus (pour tous)",
-      "Cache": "Résultats cachés (seul le Gardien les voit)"
+      "Cache": "Résultats cachés (seul le Gardien les voit)",
+      "ThemeAide": "Thème de ce lancer (bannière, carte de chat et cette fenêtre). Automatique : suit l'époque."
     },
     "Spectator": {
       "Title": "Lancer en cours...",

@@ -2,7 +2,7 @@
   "id": "roll-ensemble-coc7",
   "title": "Roll Ensemble — CoC7",
   "description": "Lancers de groupe animés pour Call of Cthulhu 7e : bannière avec les portraits chez tous les joueurs, chacun lance depuis son portrait (dés bonus/malus, paliers de réussite, jets d'opposition par équipes), carte de chat récapitulative et effets sur les 01 et les maladresses.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "authors": [
     {
       "name": "Stéphane"
@@ -57,7 +57,7 @@
   },
   "url": "https://github.com/magisterphamtom/roll-ensemble-coc7",
   "manifest": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/latest/download/module.json",
-  "download": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/download/v1.3.0/module.zip",
+  "download": "https://github.com/magisterphamtom/roll-ensemble-coc7/releases/download/v1.4.0/module.zip",
   "bugs": "https://github.com/magisterphamtom/roll-ensemble-coc7/issues",
   "license": "https://github.com/magisterphamtom/roll-ensemble-coc7/blob/main/LICENSE",
   "media": [

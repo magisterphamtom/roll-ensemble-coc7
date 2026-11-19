@@ -1118,3 +1118,8 @@
 .re-b-chance-info { flex-basis: 100%; text-align: center; font: 600 13px var(--b-label); color: #3fae5a; white-space: nowrap; }
 .re-banniere .re-b-chance-info { font-size: 14px; }
 .re-b-chance-info.re-b-chance-manque { color: var(--b-dim); font-weight: 400; font-style: italic; }
+/* 1.4 — Choix du thème à la volée dans la préparation */
+.rc-theme { display: flex; align-items: center; gap: 6px; padding: 3px 4px 3px 10px; border-radius: 16px; border: 1px solid var(--b-border2); background: var(--b-card); color: var(--b-ink); font-size: 13px; }
+.rc-theme i { color: var(--b-accent); }
+.rc-theme select { height: 26px; border: none; background: transparent; color: var(--b-ink); font-family: var(--b-label); font-size: 13px; box-shadow: none; }
+.rc-theme select option { background: var(--b-plain); color: var(--b-ink); }

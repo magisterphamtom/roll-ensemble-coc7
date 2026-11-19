@@ -74,7 +74,8 @@
       "ChercherComp": "Search a skill…",
       "DiffAucune": "None",
       "DesTous": "Bonus / penalty dice (everyone)",
-      "Cache": "Hidden results (Keeper only)"
+      "Cache": "Hidden results (Keeper only)",
+      "ThemeAide": "Theme for this roll. Automatic follows the era."
     },
     "Spectator": {
       "Title": "Rolling...",

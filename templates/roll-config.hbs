@@ -5,6 +5,12 @@
       <span class="rc-kicker">{{localize "ROLLENSEMBLECOC7.Banniere.Kicker"}}</span>
       <input type="text" name="label" value="{{label}}" placeholder="{{localize 'ROLLENSEMBLECOC7.Config.LabelPlaceholder'}}" />
     </div>
+    <label class="rc-theme" title="{{localize 'ROLLENSEMBLECOC7.Config.ThemeAide'}}">
+      <i class="fa-solid fa-palette"></i>
+      <select name="themeChoix">
+        {{#each themes}}<option value="{{this.v}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>{{/each}}
+      </select>
+    </label>
     <button type="button" class="rc-macro" data-action="saveMacro" title="{{localize 'ROLLENSEMBLECOC7.Favori.Aide'}}"><i class="fa-solid fa-bookmark"></i> {{localize "ROLLENSEMBLECOC7.Favori.Bouton"}}</button>
   </header>
 

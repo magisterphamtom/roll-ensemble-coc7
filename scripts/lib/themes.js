@@ -7,9 +7,10 @@ import { MODULE_ID } from "../settings.js";
 
 export const THEMES = ["classique", "annees20", "newyork", "montagnes", "ny2026", "antarctique2026"];
 
-export function themeActif() {
-  let choix = "auto";
-  try { choix = game.settings.get(MODULE_ID, "theme"); } catch { /* pas encore enregistré */ }
+/** @param {string|null} choixForce  thème choisi dans la fenêtre de préparation (null = réglage du module) */
+export function themeActif(choixForce = null) {
+  let choix = choixForce || "auto";
+  if (!choixForce) { try { choix = game.settings.get(MODULE_ID, "theme"); } catch { /* pas encore enregistré */ } }
   if (THEMES.includes(choix)) return choix;
 
   // 1. Bascule d'époque : le thème de chat associé à l'époque en cours

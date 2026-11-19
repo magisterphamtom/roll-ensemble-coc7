@@ -24,6 +24,7 @@ Utile pour une fuite dans les catacombes, une recherche d'indices à plusieurs, 
 - **Léger pour le processeur** (1.2) : une seule petite boucle d'animation pour tous les chiffres qui défilent, pas de flou d'arrière-plan, animations coupées si l'ordinateur demande moins de mouvements.
 - **Dice So Nice** : les dés roulent en 3D chez tout le monde (dés des dizaines du système CoC7 + dé des unités, avec les dés bonus et malus), puis le résultat s'affiche sur la bannière.
 - **Résultats cachés** (interrupteur dans la préparation) : les joueurs voient qui a lancé, pas le résultat ; seul le Gardien voit les chiffres, les dés 3D et la carte de chat.
+- **Thème à la volée** (1.4) : menu déroulant en haut de la fenêtre de préparation pour choisir le thème de ce lancer (la fenêtre change tout de suite ; le choix est gardé jusqu'au rechargement et enregistré dans les favoris).
 - **Six thèmes** : Classique, Années 20, New York années 20, Par-delà les Montagnes Hallucinées, New York 2026, Antarctique 2026. En « Automatique » (par défaut), le thème suit l'époque choisie avec **Bascule d'époque**, sinon le thème des **Cartes de chat thématiques**.
 - **Compétences du système** : le jet utilise la valeur réelle de chaque fiche (compétences, caractéristiques, Chance, Santé Mentale). Si un participant n'a pas la compétence, c'est signalé.
 - **Règles CoC7** : dés bonus et malus (de ×1 à ×2), modificateur en pourcentage, paliers Échec critique / Échec / Réussite normale / difficile / extrême / critique.
